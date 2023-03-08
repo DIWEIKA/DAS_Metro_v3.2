@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>地铁轨道监测</title>
+	<link rel="stylesheet" type="text/css" href="css/DemoWaveDisplay.css" />
+	<script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+	<script src="jQuery.js"></script>
+	<script src="qwebchannel.js"></script>
+	<script src="echarts.js"></script>
+	<script src="echarts.min.js"></script>
+	<script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+	<!-- <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script> -->
+</head>
+
+<body id="body">
+	<header id="header">
+		<h3 class="header-title">解调波形显示</h3>
+	</header>
+
+	<!-- 页面缩放设置分辨率 -->
+	<script type="text/javascript">
+		//  // body宽高
+		// let cw = 900, ch =500
+		// let body = document.getElementById('body')
+		// body.style.width = `${cw}px`
+		// body.style.height = `${ch}px` 
+
+		// 对body进行缩放
+		function windowResize() {
+			// 窗口宽高
+			let w = window.innerWidth, h = window.innerHeight
+			// 缩放比例
+			let r = w / cw < h / ch ? w / cw : h / ch
+
+			body.style.transform = `scale( ${r})`
+			// 因为scale是以body的原中心点为基准进行缩放，所以缩放之后需要调整外边距，使其位于窗口的中心位置
+			body.style.marginLeft = (-(cw - r * cw) / 2 + (w - r * cw) / 2) + 'px'
+			body.style.marginTop = (-(ch - r * ch) / 2 + (h - r * ch) / 2) + 'px'
+			body.style.marginBottom = (-(h > ch ? h : ch - r * ch)) + 'px'
+			body.style.marginRight = (-(w > cw ? w : cw - r * cw)) + 'px'
+		}
+
+		windowResize()
+		// 监听窗口尺寸变化
+		window.addEventListener('resize', windowResize);
+
+	</script>
+
+	<div id="container">
+		<h3 class="count-title">当前过车次数：</h3>
+		<label class="count-number" id="count-number">0</label>
+		<div id="flexCon">
+			<img id="t1" src="./img/train.png" >
+			<img id="t2" src="./img/train.png" >
+			<img id="t3" src="./img/train.png" >
+			<img id="t4" src="./img/train.png" >
+			<img id="t5" src="./img/train.png" >
+			<img id="t6" src="./img/train.png" >
+			<img id="t7" src="./img/train.png" >
+			<img id="t8" src="./img/train.png" >
+			<img id="t9" src="./img/train.png" >
+			<img id="t10" src="./img/train.png">
+			<img id="t11" src="./img/train.png" >
+			<img id="t12" src="./img/train.png" >
+			<img id="t13" src="./img/train.png" >
+			<img id="t14" src="./img/train.png" >
+			<img id="t15" src="./img/train.png" >
+			<img id="t16" src="./img/train.png" >
+			<img id="t17" src="./img/train.png" >
+			<img id="t18" src="./img/train.png" >
+			<img id="t19" src="./img/train.png" >
+			<img id="t20" src="./img/train.png" >
+			<img id="t21" src="./img/train.png" >
+			<img id="t22" src="./img/train.png" >
+			<img id="t23" src="./img/train.png" >
+			<img id="t24" src="./img/train.png" >
+			<img id="t25" src="./img/train.png">
+			<img id="t26" src="./img/train.png" >
+			<img id="t27" src="./img/train.png" >
+			<img id="t28" src="./img/train.png" >
+			<img id="t29" src="./img/train.png" >
+			<img id="t30" src="./img/train.png">
+			
+		
+
+			<div class="flex-row">
+				<div class="region_1-div" id="region_1-view"></div>
+				
+
+			</div>
+
+			<div class="flex-row">
+				<!-- <div class="label" id="label1">测区号</div> -->
+				<div class="region_3-div" id="label1_box"><span id="region"></span></div>
+
+				<div class="region_2-div" id="region_2-view"></div>
+
+				<!-- <div class="label" id="label2">状态</div> -->
+				<div class="region_4-div" id="label2_box"><span id="is_normal></span></div>
+
+
+			</div>
+
+    
+
+		</div>
+		
+		
+
+
+	</div>
+
+
+	<script>
+
+		// function button_stop_clicked() {
+		// 	console.log("button_stop_clicked");
+		// }
+
+		// function button_restart_clicked() {
+		// 	console.log("button_restart_clicked");
+		// }
+
+		// function button_reset_clicked() {
+		// 	console.log("button_reset_clicked");
+		// }
+	</script>
+
+	<script type="text/javascript">
+
+		/******************* 测区判断 ******************/
+		// function judgement(str){
+		// 	var region = document.getElementById('region');
+		// 	region.innerHTML=str["present_region"];
+		// 	var is_normal= document.getElementById('is_normal');
+		// 	is_normal.innerHTML=str["IsNormal"];
+			
+		// }
+
+
+		/******************* 测区判断 ******************/
+		
+		document.getElementById('t1').style.visibility = "hidden";
+		document.getElementById('t2').style.visibility = "hidden";
+		document.getElementById('t3').style.visibility = "hidden";
+		document.getElementById('t4').style.visibility = "hidden";
+		document.getElementById('t5').style.visibility = "hidden";
+		document.getElementById('t6').style.visibility = "hidden";
+		document.getElementById('t7').style.visibility = "hidden";
+		document.getElementById('t8').style.visibility = "hidden";
+		document.getElementById('t9').style.visibility = "hidden";
+		document.getElementById('t10').style.visibility = "hidden";
+		document.getElementById('t11').style.visibility = "hidden";
+		document.getElementById('t12').style.visibility = "hidden";
+		document.getElementById('t13').style.visibility = "hidden";
+		document.getElementById('t14').style.visibility = "hidden";
+		document.getElementById('t15').style.visibility = "hidden";
+		document.getElementById('t16').style.visibility = "hidden";
+		document.getElementById('t17').style.visibility = "hidden";
+		document.getElementById('t18').style.visibility = "hidden";
+		document.getElementById('t19').style.visibility = "hidden";
+		document.getElementById('t20').style.visibility = "hidden";
+		document.getElementById('t21').style.visibility = "hidden";
+		document.getElementById('t22').style.visibility = "hidden";
+		document.getElementById('t23').style.visibility = "hidden";
+		document.getElementById('t24').style.visibility = "hidden";
+		document.getElementById('t25').style.visibility = "hidden";
+		document.getElementById('t26').style.visibility = "hidden";
+		document.getElementById('t27').style.visibility = "hidden";
+		document.getElementById('t28').style.visibility = "hidden";
+		document.getElementById('t29').style.visibility = "hidden";
+		document.getElementById('t30').style.visibility = "hidden";
+		function judgement_flash(str){
+			
+			for(i=1;i<31;i++){
+				document.getElementById("t"+i.toString()).style.visibility = "hidden";
+			}
+			document.getElementById("t"+str['present_region'].toString()).style.visibility = "visible";
+		}
+		// function display_region(str){
+
+		// }
+		
+
+
+
+
+		// /******************* demo_wave display ******************/
+		function demo_wave(str) {
+
+			var dis_len = str["dis_len"]; //  一次显示横轴长度
+			var date = [];
+			for (let i = 0; i < dis_len; ++i) {
+				date.push([i]);
+			}
+
+			var dom = document.getElementById("region_2-view");
+			var myChart = echarts.init(dom, null, {
+				renderer: 'canvas',
+				useDirtyRect: false
+			});
+
+			var option;
+
+			option = {
+				animation: false,
+				tooltip: {
+					trigger: 'axis',
+					position: function (pt) {
+						return [pt[0], '10%'];
+					}
+				},
+				title: {
+					left: 'center',
+					text: 'region2'
+				},
+				toolbox: {
+					feature: {
+						dataZoom: {
+							yAxisIndex: 'none'
+						},
+						restore: {},
+						saveAsImage: {}
+					}
+				},
+				xAxis: {
+					type: 'category',
+					boundaryGap: false,
+					data: date,
+				},
+				yAxis: {
+					type: 'value',
+					boundaryGap: [0, '100%'],
+					splitLine: {
+						show: false
+					},
+					min: -3,
+					max: 3
+				},
+				// dataZoom: [
+				// 	{
+				// 		type: 'inside',
+				// 		start: 0,
+				// 		end: 10
+				// 	},
+				// 	{
+				// 		start: 0,
+				// 		end: 10
+				// 	}
+				// ],
+				series: [
+					{
+						name: 'Demo Data',
+						type: 'line',
+						showSymbol: 'false',
+						symbol: 'none',
+						sampling: 'average',
+						itemStyle: {
+							color: 'yellow',
+						},
+
+						data: str["demo_wave"]
+					}
+				]
+			};
+
+
+
+			if (option && typeof option === 'object') {
+				myChart.setOption(option);
+			}
+
+			window.addEventListener('resize', myChart.resize);
+
+
+		}
+
+
+		function fallmap_flash(str) {
+			var dom = document.getElementById('region_1-view');
+			var myChart = echarts.init(dom, null, {
+				renderer: 'canvas',
+				useDirtyRect: false
+			});
+			var app = {};
+
+			var option;
+
+			var N1 = 60; //横轴的长度(刷新次数)
+			var N2 = 30; //纵轴的长度(区域个数)
+			var N3 = 0; //起始频率
+
+			let region = [];
+
+			for (var i = N3; i < (N2 + N3); ++i) {
+				region.push(i); //分度值*点数 + 偏移量
+			}
+
+			let time = [];
+			for (var i = 0; i < N1; ++i) {
+				time.push(i);
+			}
+
+
+			let itemX = [];
+			let data = [];
+
+			let fallmap_data_1 = [];
+			let fallmap_data_2 = [];
+			let fallmap_data_3 = [];
+			let fallmap_data_4 = [];
+			let fallmap_data_5 = [];
+			let fallmap_data_6 = [];
+			let fallmap_data_7 = [];
+			let fallmap_data_8 = [];
+			let fallmap_data_9 = [];
+			let fallmap_data_10 = [];
+			let fallmap_data_11 = [];
+			let fallmap_data_12 = [];
+			let fallmap_data_13 = [];
+			let fallmap_data_14 = [];
+			let fallmap_data_15 = [];
+			let fallmap_data_16 = [];
+			let fallmap_data_17 = [];
+			let fallmap_data_18 = [];
+			let fallmap_data_19 = [];
+			let fallmap_data_20 = [];
+			let fallmap_data_21 = [];
+			let fallmap_data_22 = [];
+			let fallmap_data_23 = [];
+			let fallmap_data_24 = [];
+			let fallmap_data_25 = [];
+			let fallmap_data_26 = [];
+			let fallmap_data_27 = [];
+			let fallmap_data_28 = [];
+			let fallmap_data_29 = [];
+			let fallmap_data_30 = [];
+			let fallmap_data_31 = [];
+			let fallmap_data_32 = [];
+			let fallmap_data_33 = [];
+			let fallmap_data_34 = [];
+			let fallmap_data_35 = [];
+			let fallmap_data_36 = [];
+			let fallmap_data_37 = [];
+			let fallmap_data_38 = [];
+			let fallmap_data_39 = [];
+			let fallmap_data_40 = [];
+			let fallmap_data_41 = [];
+			let fallmap_data_42 = [];
+			let fallmap_data_43 = [];
+			let fallmap_data_44 = [];
+			let fallmap_data_45 = [];
+			let fallmap_data_46 = [];
+			let fallmap_data_47 = [];
+			let fallmap_data_48 = [];
+			let fallmap_data_49 = [];
+			let fallmap_data_50 = [];
+			let fallmap_data_51 = [];
+			let fallmap_data_52 = [];
+			let fallmap_data_53 = [];
+			let fallmap_data_54 = [];
+			let fallmap_data_55 = [];
+			let fallmap_data_56 = [];
+			let fallmap_data_57 = [];
+			let fallmap_data_58 = [];
+			let fallmap_data_59 = [];
+			let fallmap_data_60 = [];
+
+			fallmap_data_1 = str["fallmap_data_1"];
+			fallmap_data_2 = str["fallmap_data_2"];
+			fallmap_data_3 = str["fallmap_data_3"];
+			fallmap_data_4 = str["fallmap_data_4"];
+			fallmap_data_5 = str["fallmap_data_5"];
+			fallmap_data_6 = str["fallmap_data_6"];
+			fallmap_data_7 = str["fallmap_data_7"];
+			fallmap_data_8 = str["fallmap_data_8"];
+			fallmap_data_9 = str["fallmap_data_9"];
+			fallmap_data_10 = str["fallmap_data_10"];
+			fallmap_data_11 = str["fallmap_data_11"];
+			fallmap_data_12 = str["fallmap_data_12"];
+			fallmap_data_13 = str["fallmap_data_13"];
+			fallmap_data_14 = str["fallmap_data_14"];
+			fallmap_data_15 = str["fallmap_data_15"];
+			fallmap_data_16 = str["fallmap_data_16"];
+			fallmap_data_17 = str["fallmap_data_17"];
+			fallmap_data_18 = str["fallmap_data_18"];
+			fallmap_data_19 = str["fallmap_data_19"];
+			fallmap_data_20 = str["fallmap_data_20"];
+			fallmap_data_21 = str["fallmap_data_21"];
+			fallmap_data_22 = str["fallmap_data_22"];
+			fallmap_data_23 = str["fallmap_data_23"];
+			fallmap_data_24 = str["fallmap_data_24"];
+			fallmap_data_25 = str["fallmap_data_25"];
+			fallmap_data_26 = str["fallmap_data_26"];
+			fallmap_data_27 = str["fallmap_data_27"];
+			fallmap_data_28 = str["fallmap_data_28"];
+			fallmap_data_29 = str["fallmap_data_29"];
+			fallmap_data_30 = str["fallmap_data_30"];
+			fallmap_data_31 = str["fallmap_data_31"];
+			fallmap_data_32 = str["fallmap_data_32"];
+			fallmap_data_33 = str["fallmap_data_33"];
+			fallmap_data_34 = str["fallmap_data_34"];
+			fallmap_data_35 = str["fallmap_data_35"];
+			fallmap_data_36 = str["fallmap_data_36"];
+			fallmap_data_37 = str["fallmap_data_37"];
+			fallmap_data_38 = str["fallmap_data_38"];
+			fallmap_data_39 = str["fallmap_data_39"];
+			fallmap_data_40 = str["fallmap_data_40"];
+			fallmap_data_41 = str["fallmap_data_41"];
+			fallmap_data_42 = str["fallmap_data_42"];
+			fallmap_data_43 = str["fallmap_data_43"];
+			fallmap_data_44 = str["fallmap_data_44"];
+			fallmap_data_45 = str["fallmap_data_45"];
+			fallmap_data_46 = str["fallmap_data_46"];
+			fallmap_data_47 = str["fallmap_data_47"];
+			fallmap_data_48 = str["fallmap_data_48"];
+			fallmap_data_49 = str["fallmap_data_49"];
+			fallmap_data_50 = str["fallmap_data_50"];
+			fallmap_data_51 = str["fallmap_data_51"];
+			fallmap_data_52 = str["fallmap_data_52"];
+			fallmap_data_53 = str["fallmap_data_53"];
+			fallmap_data_54 = str["fallmap_data_54"];
+			fallmap_data_55 = str["fallmap_data_55"];
+			fallmap_data_56 = str["fallmap_data_56"];
+			fallmap_data_57 = str["fallmap_data_57"];
+			fallmap_data_58 = str["fallmap_data_58"];
+			fallmap_data_59 = str["fallmap_data_59"];
+			fallmap_data_60 = str["fallmap_data_60"];
+
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([0, j, fallmap_data_1[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([1, j, fallmap_data_2[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([2, j, fallmap_data_3[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([3, j, fallmap_data_4[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([4, j, fallmap_data_5[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([5, j, fallmap_data_6[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([6, j, fallmap_data_7[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([7, j, fallmap_data_8[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([8, j, fallmap_data_9[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([9, j, fallmap_data_10[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([10, j, fallmap_data_11[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([11, j, fallmap_data_12[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([12, j, fallmap_data_13[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([13, j, fallmap_data_14[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([14, j, fallmap_data_15[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([15, j, fallmap_data_16[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([16, j, fallmap_data_17[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([17, j, fallmap_data_18[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([18, j, fallmap_data_19[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([19, j, fallmap_data_20[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([20, j, fallmap_data_21[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([21, j, fallmap_data_22[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([22, j, fallmap_data_23[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([23, j, fallmap_data_24[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([24, j, fallmap_data_25[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([25, j, fallmap_data_26[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([26, j, fallmap_data_27[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([27, j, fallmap_data_28[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([28, j, fallmap_data_29[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([29, j, fallmap_data_30[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([30, j, fallmap_data_31[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([31, j, fallmap_data_32[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([32, j, fallmap_data_33[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([33, j, fallmap_data_34[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([34, j, fallmap_data_35[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([35, j, fallmap_data_36[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([36, j, fallmap_data_37[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([37, j, fallmap_data_38[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([38, j, fallmap_data_39[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([39, j, fallmap_data_40[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([40, j, fallmap_data_41[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([41, j, fallmap_data_42[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([42, j, fallmap_data_43[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([43, j, fallmap_data_44[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([44, j, fallmap_data_45[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([45, j, fallmap_data_46[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([46, j, fallmap_data_47[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([47, j, fallmap_data_48[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([48, j, fallmap_data_49[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([49, j, fallmap_data_50[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([50, j, fallmap_data_51[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([51, j, fallmap_data_52[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([52, j, fallmap_data_53[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([53, j, fallmap_data_54[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([54, j, fallmap_data_55[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([55, j, fallmap_data_56[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([56, j, fallmap_data_57[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([57, j, fallmap_data_58[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([58, j, fallmap_data_59[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([59, j, fallmap_data_60[j - N3]]);
+			}
+
+
+			option = {
+				tooltip: {
+					position: 'top'
+				},
+				grid: {
+					height: '50%',
+					top: '10%'
+				},
+				xAxis: {
+					type: 'category',
+					// data: hours,
+					splitArea: {
+						show: true
+					}
+				},
+				yAxis: {
+					type: 'category',
+					// data: days,
+					splitArea: {
+						show: true
+					}
+				},
+				visualMap: {
+					min: 0,
+					max: 10,
+					calculable: true,
+					orient: 'horizontal',
+					left: 'center',
+					bottom: '15%',
+					inRange: {
+						color: [
+							'#313695',
+							'#4575b4',
+							'#74add1',
+							'#abd9e9',
+							'#e0f3f8',
+							'#ffffbf',
+							'#fee090',
+							'#fdae61',
+							'#f46d43',
+							'#d73027',
+							'#a50026'
+						]
+					}
+				},
+				series: [
+					{
+						name: 'Punch Card',
+						type: 'heatmap',
+						data: data,
+						// label: {
+						// 	show: true
+						// },
+						emphasis: {
+							itemStyle: {
+								shadowBlur: 10,
+								shadowColor: 'rgba(0, 0, 0, 0.5)'
+							}
+						},
+						progressive: 2000,
+						animation: false
+					}
+				]
+			};
+
+			if (option && typeof option === 'object') {
+				myChart.setOption(option);
+			}
+
+			window.addEventListener('resize', myChart.resize);
+		}
+
+
+
+
+
+
+	</script>
+
+</body>
+
+</html>

@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1" />
+	<title>分布式声音传感上位机</title>
+	<link rel="stylesheet" type="text/css" href="css/FallmapDisplay.css" />
+	<script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+	<script src="jQuery.js"></script>
+	<script src="qwebchannel.js"></script>
+	<script src="echarts.js"></script>
+	<script src="echarts.min.js"></script>
+	<!-- <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script> -->
+
+</head>
+
+<body id="body" >
+	<header id="header">
+		<h3 class="header-title">时域瀑布图显示</h3>
+	</header>
+
+	<!-- 页面缩放设置分辨率 -->
+	<script type="text/javascript">
+		// body宽高
+		let cw = 1080, ch = 600
+		let body = document.getElementById('body')
+		body.style.width = `${cw}px`
+		body.style.height = `${ch}px`
+
+		// 对body进行缩放
+		function windowResize() {
+			// 窗口宽高
+			let w = window.innerWidth, h = window.innerHeight
+			// 缩放比例
+			let r = w / cw < h / ch ? w / cw : h / ch
+
+			body.style.transform = `scale( ${r})`
+			// 因为scale是以body的原中心点为基准进行缩放，所以缩放之后需要调整外边距，使其位于窗口的中心位置
+			body.style.marginLeft = (-(cw - r * cw) / 2 + (w - r * cw) / 2) + 'px'
+			body.style.marginTop = (-(ch - r * ch) / 2 + (h - r * ch) / 2) + 'px'
+			body.style.marginBottom = (-(h > ch ? h : ch - r * ch)) + 'px'
+			body.style.marginRight = (-(w > cw ? w : cw - r * cw)) + 'px'
+		}
+
+		windowResize()
+		// 监听窗口尺寸变化
+		window.addEventListener('resize', windowResize);
+
+	</script>
+
+	<div id="container">
+		<div id="flexCon">
+
+			<div class="flex-row">
+
+				<div class="fallmap-div" id="fallmap_heatmap"></div>
+
+			</div>
+		</div>
+	</div>
+
+
+	<script type="text/javascript">
+
+// var dom = document.getElementById('fallmap_heatmap');
+//     var myChart = echarts.init(dom, null, {
+//       renderer: 'canvas',
+//       useDirtyRect: false
+//     });
+//     var app = {};
+    
+//     var option;
+
+//     // prettier-ignore
+// const hours = [
+//     '12a', '1a', '2a', '3a', '4a', '5a', '6a',
+//     '7a', '8a', '9a', '10a', '11a',
+//     '12p', '1p', '2p', '3p', '4p', '5p',
+//     '6p', '7p', '8p', '9p', '10p', '11p'
+// ];
+// // prettier-ignore
+// const days = [
+//     'Saturday', 'Friday', 'Thursday',
+//     'Wednesday', 'Tuesday', 'Monday', 'Sunday'
+// ];
+// // prettier-ignore
+// const data = [[0, 0, 5], [0, 1, 1], [0, 2, 0], [0, 3, 0], [0, 4, 0], [0, 5, 0], [0, 6, 0], [0, 7, 0], [0, 8, 0], [0, 9, 0], [0, 10, 0], [0, 11, 2], [0, 12, 4], [0, 13, 1], [0, 14, 1], [0, 15, 3], [0, 16, 4], [0, 17, 6], [0, 18, 4], [0, 19, 4], [0, 20, 3], [0, 21, 3], [0, 22, 2], [0, 23, 5], [1, 0, 7], [1, 1, 0], [1, 2, 0], [1, 3, 0], [1, 4, 0], [1, 5, 0], [1, 6, 0], [1, 7, 0], [1, 8, 0], [1, 9, 0], [1, 10, 5], [1, 11, 2], [1, 12, 2], [1, 13, 6], [1, 14, 9], [1, 15, 11], [1, 16, 6], [1, 17, 7], [1, 18, 8], [1, 19, 12], [1, 20, 5], [1, 21, 5], [1, 22, 7], [1, 23, 2], [2, 0, 1], [2, 1, 1], [2, 2, 0], [2, 3, 0], [2, 4, 0], [2, 5, 0], [2, 6, 0], [2, 7, 0], [2, 8, 0], [2, 9, 0], [2, 10, 3], [2, 11, 2], [2, 12, 1], [2, 13, 9], [2, 14, 8], [2, 15, 10], [2, 16, 6], [2, 17, 5], [2, 18, 5], [2, 19, 5], [2, 20, 7], [2, 21, 4], [2, 22, 2], [2, 23, 4], [3, 0, 7], [3, 1, 3], [3, 2, 0], [3, 3, 0], [3, 4, 0], [3, 5, 0], [3, 6, 0], [3, 7, 0], [3, 8, 1], [3, 9, 0], [3, 10, 5], [3, 11, 4], [3, 12, 7], [3, 13, 14], [3, 14, 13], [3, 15, 12], [3, 16, 9], [3, 17, 5], [3, 18, 5], [3, 19, 10], [3, 20, 6], [3, 21, 4], [3, 22, 4], [3, 23, 1], [4, 0, 1], [4, 1, 3], [4, 2, 0], [4, 3, 0], [4, 4, 0], [4, 5, 1], [4, 6, 0], [4, 7, 0], [4, 8, 0], [4, 9, 2], [4, 10, 4], [4, 11, 4], [4, 12, 2], [4, 13, 4], [4, 14, 4], [4, 15, 14], [4, 16, 12], [4, 17, 1], [4, 18, 8], [4, 19, 5], [4, 20, 3], [4, 21, 7], [4, 22, 3], [4, 23, 0], [5, 0, 2], [5, 1, 1], [5, 2, 0], [5, 3, 3], [5, 4, 0], [5, 5, 0], [5, 6, 0], [5, 7, 0], [5, 8, 2], [5, 9, 0], [5, 10, 4], [5, 11, 1], [5, 12, 5], [5, 13, 10], [5, 14, 5], [5, 15, 7], [5, 16, 11], [5, 17, 6], [5, 18, 0], [5, 19, 5], [5, 20, 3], [5, 21, 4], [5, 22, 2], [5, 23, 0], [6, 0, 1], [6, 1, 0], [6, 2, 0], [6, 3, 0], [6, 4, 0], [6, 5, 0], [6, 6, 0], [6, 7, 0], [6, 8, 0], [6, 9, 0], [6, 10, 1], [6, 11, 0], [6, 12, 2], [6, 13, 1], [6, 14, 3], [6, 15, 4], [6, 16, 0], [6, 17, 0], [6, 18, 0], [6, 19, 0], [6, 20, 1], [6, 21, 2], [6, 22, 2], [6, 23, 6]]
+//     .map(function (item) {
+//     return [item[1], item[0], item[2] || '-'];
+// });
+// option = {
+//   tooltip: {
+//     position: 'top'
+//   },
+//   grid: {
+//     height: '50%',
+//     top: '10%'
+//   },
+//   xAxis: {
+//     type: 'category',
+//     data: hours,
+//     splitArea: {
+//       show: true
+//     }
+//   },
+//   yAxis: {
+//     type: 'category',
+//     data: days,
+//     splitArea: {
+//       show: true
+//     }
+//   },
+//   visualMap: {
+//     min: 0,
+//     max: 10,
+//     calculable: true,
+//     orient: 'horizontal',
+//     left: 'center',
+//     bottom: '15%'
+//   },
+//   series: [
+//     {
+//       name: 'Punch Card',
+//       type: 'heatmap',
+//       data: data,
+//       label: {
+//         show: true
+//       },
+//       emphasis: {
+//         itemStyle: {
+//           shadowBlur: 10,
+//           shadowColor: 'rgba(0, 0, 0, 0.5)'
+//         }
+//       }
+//     }
+//   ]
+// };
+
+		// function fallmap_flash(str) {
+			var dom = document.getElementById('fallmap');
+			var myChart2 = echarts.init(dom, null, {
+				renderer: 'canvas',
+				useDirtyRect: false
+			});
+			var app = {};
+			var N1 = 60; //横轴的长度(刷新次数)
+			var N2 = 30; //纵轴的长度(区域个数)
+			var N3 = 0; //起始频率
+
+			var option;
+
+			// prettier-ignore
+			let region = [];
+
+			for (var i = N3; i < (N2 + N3); ++i) {
+				region.push(i); //分度值*点数 + 偏移量
+			}
+
+			let time = [];
+			for (var i = 0; i < N1; ++i) {
+				time.push(1 * i);
+			}
+
+
+			let itemX = [];
+			let data = [];
+
+			let fallmap_data_1 = [];
+			let fallmap_data_2 = [];
+			let fallmap_data_3 = [];
+			let fallmap_data_4 = [];
+			let fallmap_data_5 = [];
+			let fallmap_data_6 = [];
+			let fallmap_data_7 = [];
+			let fallmap_data_8 = [];
+			let fallmap_data_9 = [];
+			let fallmap_data_10 = [];
+			let fallmap_data_11 = [];
+			let fallmap_data_12 = [];
+			let fallmap_data_13 = [];
+			let fallmap_data_14 = [];
+			let fallmap_data_15 = [];
+			let fallmap_data_16 = [];
+			let fallmap_data_17 = [];
+			let fallmap_data_18 = [];
+			let fallmap_data_19 = [];
+			let fallmap_data_20 = [];
+			let fallmap_data_21 = [];
+			let fallmap_data_22 = [];
+			let fallmap_data_23 = [];
+			let fallmap_data_24 = [];
+			let fallmap_data_25 = [];
+			let fallmap_data_26 = [];
+			let fallmap_data_27 = [];
+			let fallmap_data_28 = [];
+			let fallmap_data_29 = [];
+			let fallmap_data_30 = [];
+			let fallmap_data_31 = [];
+			let fallmap_data_32 = [];
+			let fallmap_data_33 = [];
+			let fallmap_data_34 = [];
+			let fallmap_data_35 = [];
+			let fallmap_data_36 = [];
+			let fallmap_data_37 = [];
+			let fallmap_data_38 = [];
+			let fallmap_data_39 = [];
+			let fallmap_data_40 = [];
+			let fallmap_data_41 = [];
+			let fallmap_data_42 = [];
+			let fallmap_data_43 = [];
+			let fallmap_data_44 = [];
+			let fallmap_data_45 = [];
+			let fallmap_data_46 = [];
+			let fallmap_data_47 = [];
+			let fallmap_data_48 = [];
+			let fallmap_data_49 = [];
+			let fallmap_data_50 = [];
+			let fallmap_data_51 = [];
+			let fallmap_data_52 = [];
+			let fallmap_data_53 = [];
+			let fallmap_data_54 = [];
+			let fallmap_data_55 = [];
+			let fallmap_data_56 = [];
+			let fallmap_data_57 = [];
+			let fallmap_data_58 = [];
+			let fallmap_data_59 = [];
+			let fallmap_data_60 = [];
+			// let fallmap_data_61 = [];
+			// let fallmap_data_62 = [];
+			// let fallmap_data_63 = [];
+			// let fallmap_data_64 = [];
+			// let fallmap_data_65 = [];
+			// let fallmap_data_66 = [];
+			// let fallmap_data_67 = [];
+			// let fallmap_data_68 = [];
+			// let fallmap_data_69 = [];
+			// let fallmap_data_70 = [];
+			// let fallmap_data_71 = [];
+			// let fallmap_data_72 = [];
+			// let fallmap_data_73 = [];
+			// let fallmap_data_74 = [];
+			// let fallmap_data_75 = [];
+			// let fallmap_data_76 = [];
+			// let fallmap_data_77 = [];
+			// let fallmap_data_78 = [];
+			// let fallmap_data_79 = [];
+			// let fallmap_data_80 = [];
+			// let fallmap_data_81 = [];
+			// let fallmap_data_82 = [];
+			// let fallmap_data_83 = [];
+			// let fallmap_data_84 = [];
+			// let fallmap_data_85 = [];
+			// let fallmap_data_86 = [];
+			// let fallmap_data_87 = [];
+			// let fallmap_data_88 = [];
+			// let fallmap_data_89 = [];
+			// let fallmap_data_90 = [];
+			// let fallmap_data_91 = [];
+			// let fallmap_data_92 = [];
+			// let fallmap_data_93 = [];
+			// let fallmap_data_94 = [];
+			// let fallmap_data_95 = [];
+			// let fallmap_data_96 = [];
+			// let fallmap_data_97 = [];
+			// let fallmap_data_98 = [];
+			// let fallmap_data_99 = [];
+			// let fallmap_data_100 = [];
+			// let fallmap_data_101 = [];
+			// let fallmap_data_102 = [];
+			// let fallmap_data_103 = [];
+			// let fallmap_data_104 = [];
+			// let fallmap_data_105 = [];
+			// let fallmap_data_106 = [];
+			// let fallmap_data_107 = [];
+			// let fallmap_data_108 = [];
+			// let fallmap_data_109 = [];
+			// let fallmap_data_110 = [];
+			// let fallmap_data_111 = [];
+			// let fallmap_data_112 = [];
+			// let fallmap_data_113 = [];
+			// let fallmap_data_114 = [];
+			// let fallmap_data_115 = [];
+			// let fallmap_data_116 = [];
+			// let fallmap_data_117 = [];
+			// let fallmap_data_118 = [];
+			// let fallmap_data_119 = [];
+			// let fallmap_data_120 = [];
+			// let fallmap_data_121 = [];
+			// let fallmap_data_122 = [];
+			// let fallmap_data_123 = [];
+			// let fallmap_data_124 = [];
+			// let fallmap_data_125 = [];
+			// let fallmap_data_126 = [];
+			// let fallmap_data_127 = [];
+			// let fallmap_data_128 = [];
+			// let fallmap_data_129 = [];
+			// let fallmap_data_130 = [];
+			// let fallmap_data_131 = [];
+			// let fallmap_data_132 = [];
+			// let fallmap_data_133 = [];
+			// let fallmap_data_134 = [];
+			// let fallmap_data_135 = [];
+			// let fallmap_data_136 = [];
+			// let fallmap_data_137 = [];
+			// let fallmap_data_138 = [];
+			// let fallmap_data_139 = [];
+			// let fallmap_data_140 = [];
+			// let fallmap_data_141 = [];
+			// let fallmap_data_142 = [];
+			// let fallmap_data_143 = [];
+			// let fallmap_data_144 = [];
+			// let fallmap_data_145 = [];
+			// let fallmap_data_146 = [];
+			// let fallmap_data_147 = [];
+			// let fallmap_data_148 = [];
+			// let fallmap_data_149 = [];
+			// let fallmap_data_150 = [];
+
+			fallmap_data_1 = str["fallmap_data_1"];
+			fallmap_data_2 = str["fallmap_data_2"];
+			fallmap_data_3 = str["fallmap_data_3"];
+			fallmap_data_4 = str["fallmap_data_4"];
+			fallmap_data_5 = str["fallmap_data_5"];
+			fallmap_data_6 = str["fallmap_data_6"];
+			fallmap_data_7 = str["fallmap_data_7"];
+			fallmap_data_8 = str["fallmap_data_8"];
+			fallmap_data_9 = str["fallmap_data_9"];
+			fallmap_data_10 = str["fallmap_data_10"];
+			fallmap_data_11 = str["fallmap_data_11"];
+			fallmap_data_12 = str["fallmap_data_12"];
+			fallmap_data_13 = str["fallmap_data_13"];
+			fallmap_data_14 = str["fallmap_data_14"];
+			fallmap_data_15 = str["fallmap_data_15"];
+			fallmap_data_16 = str["fallmap_data_16"];
+			fallmap_data_17 = str["fallmap_data_17"];
+			fallmap_data_18 = str["fallmap_data_18"];
+			fallmap_data_19 = str["fallmap_data_19"];
+			fallmap_data_20 = str["fallmap_data_20"];
+			fallmap_data_21 = str["fallmap_data_21"];
+			fallmap_data_22 = str["fallmap_data_22"];
+			fallmap_data_23 = str["fallmap_data_23"];
+			fallmap_data_24 = str["fallmap_data_24"];
+			fallmap_data_25 = str["fallmap_data_25"];
+			fallmap_data_26 = str["fallmap_data_26"];
+			fallmap_data_27 = str["fallmap_data_27"];
+			fallmap_data_28 = str["fallmap_data_28"];
+			fallmap_data_29 = str["fallmap_data_29"];
+			fallmap_data_30 = str["fallmap_data_30"];
+			fallmap_data_31 = str["fallmap_data_31"];
+			fallmap_data_32 = str["fallmap_data_32"];
+			fallmap_data_33 = str["fallmap_data_33"];
+			fallmap_data_34 = str["fallmap_data_34"];
+			fallmap_data_35 = str["fallmap_data_35"];
+			fallmap_data_36 = str["fallmap_data_36"];
+			fallmap_data_37 = str["fallmap_data_37"];
+			fallmap_data_38 = str["fallmap_data_38"];
+			fallmap_data_39 = str["fallmap_data_39"];
+			fallmap_data_40 = str["fallmap_data_40"];
+			fallmap_data_41 = str["fallmap_data_41"];
+			fallmap_data_42 = str["fallmap_data_42"];
+			fallmap_data_43 = str["fallmap_data_43"];
+			fallmap_data_44 = str["fallmap_data_44"];
+			fallmap_data_45 = str["fallmap_data_45"];
+			fallmap_data_46 = str["fallmap_data_46"];
+			fallmap_data_47 = str["fallmap_data_47"];
+			fallmap_data_48 = str["fallmap_data_48"];
+			fallmap_data_49 = str["fallmap_data_49"];
+			fallmap_data_50 = str["fallmap_data_50"];
+			fallmap_data_51 = str["fallmap_data_51"];
+			fallmap_data_52 = str["fallmap_data_52"];
+			fallmap_data_53 = str["fallmap_data_53"];
+			fallmap_data_54 = str["fallmap_data_54"];
+			fallmap_data_55 = str["fallmap_data_55"];
+			fallmap_data_56 = str["fallmap_data_56"];
+			fallmap_data_57 = str["fallmap_data_57"];
+			fallmap_data_58 = str["fallmap_data_58"];
+			fallmap_data_59 = str["fallmap_data_59"];
+			fallmap_data_60 = str["fallmap_data_60"];
+			// fallmap_data_61 = str["fallmap_data_61"];
+			// fallmap_data_62 = str["fallmap_data_62"];
+			// fallmap_data_63 = str["fallmap_data_63"];
+			// fallmap_data_64 = str["fallmap_data_64"];
+			// fallmap_data_65 = str["fallmap_data_65"];
+			// fallmap_data_66 = str["fallmap_data_66"];
+			// fallmap_data_67 = str["fallmap_data_67"];
+			// fallmap_data_68 = str["fallmap_data_68"];
+			// fallmap_data_69 = str["fallmap_data_69"];
+
+			// fallmap_data_70 = str["fallmap_data_70"];
+			// fallmap_data_71 = str["fallmap_data_71"];
+			// fallmap_data_72 = str["fallmap_data_72"];
+			// fallmap_data_73 = str["fallmap_data_73"];
+			// fallmap_data_74 = str["fallmap_data_74"];
+			// fallmap_data_75 = str["fallmap_data_75"];
+			// fallmap_data_76 = str["fallmap_data_76"];
+			// fallmap_data_77 = str["fallmap_data_77"];
+			// fallmap_data_78 = str["fallmap_data_78"];
+			// fallmap_data_79 = str["fallmap_data_79"];
+			// fallmap_data_80 = str["fallmap_data_80"];
+			// fallmap_data_81 = str["fallmap_data_81"];
+			// fallmap_data_82 = str["fallmap_data_82"];
+			// fallmap_data_83 = str["fallmap_data_83"];
+			// fallmap_data_84 = str["fallmap_data_84"];
+			// fallmap_data_85 = str["fallmap_data_85"];
+			// fallmap_data_86 = str["fallmap_data_86"];
+			// fallmap_data_87 = str["fallmap_data_87"];
+			// fallmap_data_88 = str["fallmap_data_88"];
+			// fallmap_data_89 = str["fallmap_data_89"];
+
+			// fallmap_data_90 = str["fallmap_data_90"];
+			// fallmap_data_91 = str["fallmap_data_91"];
+			// fallmap_data_92 = str["fallmap_data_92"];
+			// fallmap_data_93 = str["fallmap_data_93"];
+			// fallmap_data_94 = str["fallmap_data_94"];
+			// fallmap_data_95 = str["fallmap_data_95"];
+			// fallmap_data_96 = str["fallmap_data_96"];
+			// fallmap_data_97 = str["fallmap_data_97"];
+			// fallmap_data_98 = str["fallmap_data_98"];
+			// fallmap_data_99 = str["fallmap_data_99"];
+			// fallmap_data_100 = str["fallmap_data_100"];
+			// fallmap_data_101 = str["fallmap_data_101"];
+			// fallmap_data_102 = str["fallmap_data_102"];
+			// fallmap_data_103 = str["fallmap_data_103"];
+			// fallmap_data_104 = str["fallmap_data_104"];
+			// fallmap_data_105 = str["fallmap_data_105"];
+			// fallmap_data_106 = str["fallmap_data_106"];
+			// fallmap_data_107 = str["fallmap_data_107"];
+			// fallmap_data_108 = str["fallmap_data_108"];
+			// fallmap_data_109 = str["fallmap_data_109"];
+
+			// fallmap_data_100 = str["fallmap_data_100"];
+			// fallmap_data_101 = str["fallmap_data_101"];
+			// fallmap_data_102 = str["fallmap_data_102"];
+			// fallmap_data_103 = str["fallmap_data_103"];
+			// fallmap_data_104 = str["fallmap_data_104"];
+			// fallmap_data_105 = str["fallmap_data_105"];
+			// fallmap_data_106 = str["fallmap_data_106"];
+			// fallmap_data_107 = str["fallmap_data_107"];
+			// fallmap_data_108 = str["fallmap_data_108"];
+			// fallmap_data_109 = str["fallmap_data_109"];
+			// fallmap_data_110 = str["fallmap_data_110"];
+			// fallmap_data_111 = str["fallmap_data_111"];
+			// fallmap_data_112 = str["fallmap_data_112"];
+			// fallmap_data_113 = str["fallmap_data_113"];
+			// fallmap_data_114 = str["fallmap_data_114"];
+			// fallmap_data_115 = str["fallmap_data_115"];
+			// fallmap_data_116 = str["fallmap_data_116"];
+			// fallmap_data_117 = str["fallmap_data_117"];
+			// fallmap_data_118 = str["fallmap_data_118"];
+			// fallmap_data_119 = str["fallmap_data_119"];
+
+			// fallmap_data_120 = str["fallmap_data_120"];
+			// fallmap_data_121 = str["fallmap_data_121"];
+			// fallmap_data_122 = str["fallmap_data_122"];
+			// fallmap_data_123 = str["fallmap_data_123"];
+			// fallmap_data_124 = str["fallmap_data_124"];
+			// fallmap_data_125 = str["fallmap_data_125"];
+			// fallmap_data_126 = str["fallmap_data_126"];
+			// fallmap_data_127 = str["fallmap_data_127"];
+			// fallmap_data_128 = str["fallmap_data_128"];
+			// fallmap_data_129 = str["fallmap_data_129"];
+			// fallmap_data_130 = str["fallmap_data_130"];
+			// fallmap_data_131 = str["fallmap_data_131"];
+			// fallmap_data_132 = str["fallmap_data_132"];
+			// fallmap_data_133 = str["fallmap_data_133"];
+			// fallmap_data_134 = str["fallmap_data_134"];
+			// fallmap_data_135 = str["fallmap_data_135"];
+			// fallmap_data_136 = str["fallmap_data_136"];
+			// fallmap_data_137 = str["fallmap_data_137"];
+			// fallmap_data_138 = str["fallmap_data_138"];
+			// fallmap_data_139 = str["fallmap_data_139"];
+			// fallmap_data_140 = str["fallmap_data_140"];
+
+			// fallmap_data_141 = str["fallmap_data_141"];
+			// fallmap_data_142 = str["fallmap_data_142"];
+			// fallmap_data_143 = str["fallmap_data_143"];
+			// fallmap_data_144 = str["fallmap_data_144"];
+			// fallmap_data_145 = str["fallmap_data_145"];
+			// fallmap_data_146 = str["fallmap_data_146"];
+			// fallmap_data_147 = str["fallmap_data_147"];
+			// fallmap_data_148 = str["fallmap_data_148"];
+			// fallmap_data_149 = str["fallmap_data_149"];
+			// fallmap_data_150 = str["fallmap_data_150"];
+
+			// var N3=0;var N2=400;
+			// for (var j = N3; j < ((N2+N3)); ++j) { 
+			// 	data.push([0, j, fallmap_data_1[j-N3]]);
+			// }
+
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([0, j, fallmap_data_1[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([1, j, fallmap_data_2[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([2, j, fallmap_data_3[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([3, j, fallmap_data_4[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([4, j, fallmap_data_5[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([5, j, fallmap_data_6[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([6, j, fallmap_data_7[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([7, j, fallmap_data_8[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([8, j, fallmap_data_9[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([9, j, fallmap_data_10[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([10, j, fallmap_data_11[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([11, j, fallmap_data_12[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([12, j, fallmap_data_13[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([13, j, fallmap_data_14[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([14, j, fallmap_data_15[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([15, j, fallmap_data_16[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([16, j, fallmap_data_17[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([17, j, fallmap_data_18[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([18, j, fallmap_data_19[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([19, j, fallmap_data_20[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([20, j, fallmap_data_21[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([21, j, fallmap_data_22[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([22, j, fallmap_data_23[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([23, j, fallmap_data_24[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([24, j, fallmap_data_25[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([25, j, fallmap_data_26[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([26, j, fallmap_data_27[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([27, j, fallmap_data_28[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([28, j, fallmap_data_29[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([29, j, fallmap_data_30[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([30, j, fallmap_data_31[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([31, j, fallmap_data_32[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([32, j, fallmap_data_33[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([33, j, fallmap_data_34[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([34, j, fallmap_data_35[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([35, j, fallmap_data_36[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([36, j, fallmap_data_37[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([37, j, fallmap_data_38[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([38, j, fallmap_data_39[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([39, j, fallmap_data_40[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([40, j, fallmap_data_41[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([41, j, fallmap_data_42[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([42, j, fallmap_data_43[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([43, j, fallmap_data_44[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([44, j, fallmap_data_45[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([45, j, fallmap_data_46[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([46, j, fallmap_data_47[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([47, j, fallmap_data_48[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([48, j, fallmap_data_49[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([49, j, fallmap_data_50[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([50, j, fallmap_data_51[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([51, j, fallmap_data_52[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([52, j, fallmap_data_53[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([53, j, fallmap_data_54[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([54, j, fallmap_data_55[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([55, j, fallmap_data_56[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([56, j, fallmap_data_57[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([57, j, fallmap_data_58[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([58, j, fallmap_data_59[j - N3]]);
+			}
+			for (var j = N3; j < (N2 + N3); ++j) {
+				data.push([59, j, fallmap_data_60[j - N3]]);
+			}
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([60, j, fallmap_data_61[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([61, j, fallmap_data_62[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([62, j, fallmap_data_63[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([63, j, fallmap_data_64[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([64, j, fallmap_data_65[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([65, j, fallmap_data_66[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([66, j, fallmap_data_67[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([67, j, fallmap_data_68[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([68, j, fallmap_data_69[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([69, j, fallmap_data_70[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([70, j, fallmap_data_71[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([71, j, fallmap_data_72[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([72, j, fallmap_data_73[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([73, j, fallmap_data_74[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([74, j, fallmap_data_75[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([75, j, fallmap_data_76[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([76, j, fallmap_data_77[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([77, j, fallmap_data_78[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([78, j, fallmap_data_79[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([79, j, fallmap_data_80[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([80, j, fallmap_data_81[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([81, j, fallmap_data_82[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([82, j, fallmap_data_83[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([83, j, fallmap_data_84[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([84, j, fallmap_data_85[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([85, j, fallmap_data_86[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([86, j, fallmap_data_87[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([87, j, fallmap_data_88[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([88, j, fallmap_data_89[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([89, j, fallmap_data_90[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([90, j, fallmap_data_91[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([91, j, fallmap_data_92[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([92, j, fallmap_data_93[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([93, j, fallmap_data_94[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([94, j, fallmap_data_95[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([95, j, fallmap_data_96[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([96, j, fallmap_data_97[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([97, j, fallmap_data_98[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([98, j, fallmap_data_99[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([99, j, fallmap_data_100[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([100, j, fallmap_data_101[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([101, j, fallmap_data_102[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([102, j, fallmap_data_103[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([103, j, fallmap_data_104[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([104, j, fallmap_data_105[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([105, j, fallmap_data_106[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([106, j, fallmap_data_107[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([107, j, fallmap_data_108[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([108, j, fallmap_data_109[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([109, j, fallmap_data_110[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([110, j, fallmap_data_111[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([111, j, fallmap_data_112[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([112, j, fallmap_data_113[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([113, j, fallmap_data_114[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([114, j, fallmap_data_115[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([115, j, fallmap_data_116[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([116, j, fallmap_data_117[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([117, j, fallmap_data_118[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([118, j, fallmap_data_119[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([119, j, fallmap_data_120[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([120, j, fallmap_data_121[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([121, j, fallmap_data_122[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([122, j, fallmap_data_123[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([123, j, fallmap_data_124[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([124, j, fallmap_data_125[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([125, j, fallmap_data_126[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([126, j, fallmap_data_127[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([127, j, fallmap_data_128[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([128, j, fallmap_data_129[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([129, j, fallmap_data_130[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([130, j, fallmap_data_131[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([131, j, fallmap_data_132[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([132, j, fallmap_data_133[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([133, j, fallmap_data_134[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([134, j, fallmap_data_135[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([135, j, fallmap_data_136[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([136, j, fallmap_data_137[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([137, j, fallmap_data_138[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([138, j, fallmap_data_139[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([139, j, fallmap_data_140[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([140, j, fallmap_data_141[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([141, j, fallmap_data_142[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([142, j, fallmap_data_143[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([143, j, fallmap_data_144[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([144, j, fallmap_data_145[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([145, j, fallmap_data_146[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([146, j, fallmap_data_147[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([147, j, fallmap_data_148[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([148, j, fallmap_data_149[j - N3]]);
+			// }
+			// for (var j = N3; j < (N2 + N3); ++j) {
+			// 	data.push([149, j, fallmap_data_150[j - N3]]);
+			// }
+
+			// for(var i=0; i<150; ++i){
+			// 	for(var j=N3; j<(N2+N3); ++j){
+			// 		data.push([i,j,9]);
+			// 	}
+			// }
+
+
+			option = {
+
+				tooltip: {
+					position: 'top'
+				},
+				grid: {
+					height: '50%',
+					top: '10%'
+				},
+				xAxis: {
+					type: 'category',
+					name: "time/s",
+					data: time,
+					splitArea: {
+						show: true
+					}
+				},
+				yAxis: {
+					type: 'category',
+					data: region,
+					name: "regionNumber",
+					// min: 800,
+					// max: 1200,
+					splitArea: {
+						show: true
+					}
+				},
+				visualMap: {
+					// min: 0,
+					// max: 3,
+					calculable: true,
+					orient: 'horizontal',
+					left: 'center',
+					bottom: '15%',
+					inRange: {
+						color: [
+							'#313695',
+							'#4575b4',
+							'#74add1',
+							'#abd9e9',
+							'#e0f3f8',
+							'#ffffbf',
+							'#fee090',
+							'#fdae61',
+							'#f46d43',
+							'#d73027',
+							'#a50026'
+						]
+					}
+				},
+				series: [
+					{
+						name: 'FFT results',
+						type: 'heatmap',
+
+						data: data,
+						// label: {
+						//   show: true
+						// },
+						emphasis: {
+							itemStyle: {
+								shadowBlur: 10,
+								shadowColor: 'rgba(0, 0, 0, 0.5)'
+							}
+						},
+						progressive: 2000,
+						animation: false
+					}
+				]
+			};
+
+			if (option && typeof option === 'object') {
+				myChart2.setOption(option);
+			}
+
+			window.addEventListener('resize', myChart2.resize);
+		// }
+	</script>
+
+</body>
+
+</html>

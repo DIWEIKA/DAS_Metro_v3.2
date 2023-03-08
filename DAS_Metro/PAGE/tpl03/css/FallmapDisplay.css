@@ -1,0 +1,93 @@
+@charset "utf-8";
+
+/* global */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html,
+body {
+	width: 100%;
+	height: 100%;
+	min-width: 1200px;
+	min-height: 600px;
+	overflow: hidden;
+}
+
+body {
+	position: relative;
+	font-family: "Microsoft Yahei", Arial, sans-serif;
+	background: #050d3c url("../img/bg.png") 0 0 / 100% 100% no-repeat;
+}
+/* layout */
+#header {
+	position:relative;
+	height:72px;
+	background:url("../img/header.png") 0 0 / 100% 100% no-repeat;
+	overflow:hidden;
+}
+.header-title {line-height:64px;text-align:center;font-size:32px;font-weight:400;color:#bef2ff;}
+
+#container {position:absolute;top:64px;bottom:15px;left:0;right:0;}
+
+#flexCon {
+	height:100%;
+	width: 100%;
+	display:-webkit-flex;
+	display:-ms-flexbox;
+	display:flex;
+	-webkit-flex-direction:column;
+	-ms-flex-direction:column;
+	flex-direction:column;
+	
+}
+.flex-row {
+	-webkit-flex:1;
+	-ms-flex:1;
+	flex:1;
+	display:-webkit-flex;
+	display:-ms-flexbox;
+	display:flex;
+	
+}
+
+
+
+.fallmap-div {
+	position:absolute;
+	top:2%;
+	bottom:0%;
+	left:0%;
+	right:0%;
+	border-style:solid;
+	border-width:26px 27px 27px;
+	border-image:url("../img/chart-wrapper.png") 26 27 27 fill / 1 / 0 repeat;
+}
+
+
+/* .chart-title1 {
+	position:relative;
+	height:30px;
+	font-size:20px;
+	font-weight:normal;
+	color:#5ac8fa;
+	left: 45%;
+	
+}
+
+
+.chart-title3 {
+	position:relative;
+	height: 30px;
+	font-size:20px;
+	font-weight:normal;
+	color:#5ac8fa;
+	left: 48%;	
+} */
+
+
+
+
+

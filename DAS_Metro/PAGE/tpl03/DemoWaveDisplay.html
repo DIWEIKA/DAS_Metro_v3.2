@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>地铁轨道监测</title>
+	<link rel="stylesheet" type="text/css" href="css/DemoWaveDisplay.css" />
+	<script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+	<script src="jQuery.js"></script>
+	<script src="qwebchannel.js"></script>
+	<script src="echarts.js"></script>
+	<script src="echarts.min.js"></script>
+	<script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+	<!-- <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script> -->
+</head>
+
+<body id="body">
+	<header id="header">
+		<h3 class="header-title">解调波形显示</h3>
+	</header>
+
+	<!-- 页面缩放设置分辨率 -->
+	<script type="text/javascript">
+		//  // body宽高
+		// let cw = 900, ch =500
+		// let body = document.getElementById('body')
+		// body.style.width = `${cw}px`
+		// body.style.height = `${ch}px` 
+
+		// 对body进行缩放
+		function windowResize() {
+			// 窗口宽高
+			let w = window.innerWidth, h = window.innerHeight
+			// 缩放比例
+			let r = w / cw < h / ch ? w / cw : h / ch
+
+			body.style.transform = `scale( ${r})`
+			// 因为scale是以body的原中心点为基准进行缩放，所以缩放之后需要调整外边距，使其位于窗口的中心位置
+			body.style.marginLeft = (-(cw - r * cw) / 2 + (w - r * cw) / 2) + 'px'
+			body.style.marginTop = (-(ch - r * ch) / 2 + (h - r * ch) / 2) + 'px'
+			body.style.marginBottom = (-(h > ch ? h : ch - r * ch)) + 'px'
+			body.style.marginRight = (-(w > cw ? w : cw - r * cw)) + 'px'
+		}
+
+		windowResize()
+		// 监听窗口尺寸变化
+		window.addEventListener('resize', windowResize);
+
+	</script>
+
+	<div id="container">
+		<h3 class="count-title">当前过车次数：</h3>
+		<label class="count-number" id="count-number">0</label>
+		<div id="flexCon">
+
+			<div class="flex-row">
+				<div class="region_1-div" id="region_1-view"></div>
+
+			</div>
+
+			<div class="flex-row">
+
+				<div class="region_2-div" id="region_2-view"></div>
+
+			</div>
+
+			<div class="flex-row">
+
+				<div class="region_3-div" id="region_3-view"></div>
+
+			</div>
+
+		</div>
+
+		<div id="flexCon">
+
+			<div class="flex-row">
+
+				<div class="region_4-div" id="region_4-view"></div>
+
+			</div>
+
+			<div class="flex-row">
+
+				<div class="region_5-div" id="region_5-view"></div>
+
+			</div>
+
+			<div class="flex-row">
+
+				<div class="region_6-div" id="region_6-view"></div>
+
+			</div>
+
+		</div>
+	</div>
+
+
+	<script>
+
+		// function button_stop_clicked() {
+		// 	console.log("button_stop_clicked");
+		// }
+
+		// function button_restart_clicked() {
+		// 	console.log("button_restart_clicked");
+		// }
+
+		// function button_reset_clicked() {
+		// 	console.log("button_reset_clicked");
+		// }
+	</script>
+
+	<script type="text/javascript">
+
+		/******************* 获取时间 ******************/
+		var hour, minute, second, msecond;
+
+		
+
+		// /******************* region_2 display ******************/
+		function demo_wave(str) {
+
+			var dis_len = str["dis_len"]; //  一次显示横轴长度
+			var date = []; 
+			for (let i = 0; i < dis_len; ++i) {
+				date.push([i]);
+			}
+
+			var dom = document.getElementById("region_2-view");
+			var myChart = echarts.init(dom, null, {
+				renderer: 'canvas',
+				useDirtyRect: false
+			});
+
+			var option;
+
+			option = {
+				animation: false,
+				tooltip: {
+					trigger: 'axis',
+					position: function (pt) {
+						return [pt[0], '10%'];
+					}
+				},
+				title: {
+					left: 'center',
+					text: 'region2'
+				},
+				toolbox: {
+					feature: {
+						dataZoom: {
+							yAxisIndex: 'none'
+						},
+						restore: {},
+						saveAsImage: {}
+					}
+				},
+				xAxis: {
+					type: 'category',
+					boundaryGap: false,
+					data: date,
+				},
+				yAxis: {
+					type: 'value',
+					boundaryGap: [0, '100%'],
+					splitLine: {
+						show: false
+					},
+					min: -3,
+					max: 3
+				},
+				// dataZoom: [
+				// 	{
+				// 		type: 'inside',
+				// 		start: 0,
+				// 		end: 10
+				// 	},
+				// 	{
+				// 		start: 0,
+				// 		end: 10
+				// 	}
+				// ],
+				series: [
+					{
+						name: 'Demo Data',
+						type: 'line',
+						showSymbol: 'false',
+						symbol: 'none',
+						sampling: 'average',
+						itemStyle: {
+							color: 'yellow',
+						},
+
+						data: str["demo_wave"]
+					}
+				]
+			};
+
+
+
+			if (option && typeof option === 'object') {
+				myChart.setOption(option);
+			}
+
+			window.addEventListener('resize', myChart.resize);
+
+			
+		}
+
+
+
+
+
+
+	</script>
+
+</body>
+
+</html>

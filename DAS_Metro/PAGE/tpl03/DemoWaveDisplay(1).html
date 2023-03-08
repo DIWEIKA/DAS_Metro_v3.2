@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<title>地铁轨道监测</title>
+	<link rel="stylesheet" type="text/css" href="css/DemoWaveDisplay.css" />
+	<script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+	<script src="jQuery.js"></script>
+	<script src="qwebchannel.js"></script>
+	<script src="echarts.js"></script>
+	<script src="echarts.min.js"></script>
+	<script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+
+</head>
+
+<body id="body" onload=" getnow()">
+	<header id="header">
+		<h3 class="header-title">解调波形显示</h3>
+	</header>
+
+	<!-- 页面缩放设置分辨率 -->
+	<script type="text/javascript">
+		// body宽高
+		let cw = 1280, ch = 720
+		let body = document.getElementById('demowave_view')
+		body.style.width = `${cw}px`
+		body.style.height = `${ch}px`
+
+		// 对body进行缩放
+		function windowResize() {
+			// 窗口宽高
+			let w = window.innerWidth, h = window.innerHeight
+			// 缩放比例
+			let r = w / cw < h / ch ? w / cw : h / ch
+
+			body.style.transform = `scale( ${r})`
+			// 因为scale是以body的原中心点为基准进行缩放，所以缩放之后需要调整外边距，使其位于窗口的中心位置
+			body.style.marginLeft = (-(cw - r * cw) / 2 + (w - r * cw) / 2) + 'px'
+			body.style.marginTop = (-(ch - r * ch) / 2 + (h - r * ch) / 2) + 'px'
+			body.style.marginBottom = (-(h > ch ? h : ch - r * ch)) + 'px'
+			body.style.marginRight = (-(w > cw ? w : cw - r * cw)) + 'px'
+		}
+
+		windowResize()
+		// 监听窗口尺寸变化
+		window.addEventListener('resize', windowResize);
+
+	</script>
+
+	<div id="container">
+		<h3 class="count-title">当前过车次数：</h3>
+		<label class="count-number" id="count-number">0</label>
+		<div id="flexCon">
+
+			<div class="flex-row">
+				<div class="region_1-div" id="region_1-view"></div>
+
+			</div>
+
+			<div class="flex-row">
+
+				<div class="region_2-div" id="region_2-view"></div>
+
+			</div>
+
+			<div class="flex-row">
+
+				<div class="region_3-div" id="region_3-view"></div>
+
+			</div>
+
+		</div>
+
+		<div id="flexCon">
+
+			<div class="flex-row">
+
+				<div class="region_4-div" id="region_4-view"></div>
+
+			</div>
+
+			<div class="flex-row">
+
+				<div class="region_5-div" id="region_5-view"></div>
+
+			</div>
+
+			<div class="flex-row">
+
+				<div class="region_6-div" id="region_6-view"></div>
+
+			</div>
+
+		</div>
+	</div>
+
+
+	<script>
+
+		// function button_stop_clicked() {
+		// 	console.log("button_stop_clicked");
+		// }
+
+		// function button_restart_clicked() {
+		// 	console.log("button_restart_clicked");
+		// }
+
+		// function button_reset_clicked() {
+		// 	console.log("button_reset_clicked");
+		// }
+	</script>
+
+	<script type="text/javascript">
+
+		/******************* 获取时间 ******************/
+		var hour, minute, second, msecond;
+		function getnow() {
+			//1、获得当前时间，格式化时间
+			var now = new Date();
+			var date = now.getDate();
+
+			if (date < 10) {
+				date = "0" + date;
+			}
+			hour = now.getHours();
+			if (hour < 10) {
+				hour = "0" + hour;
+			}
+			minute = now.getMinutes();
+			if (minute < 10) {
+				minute = "0" + minute;
+			}
+			second = now.getSeconds();
+			if (second < 10) {
+				second = "0" + second;
+			}
+			msecond = now.getMilliseconds();
+			if (second < 10) {
+				msecond = "0" + msecond;
+			}
+
+			var nowstr = hour + ":" + minute + ":" + second + ":" + msecond;
+
+			//2、显示时间 html
+			//获得标签对象
+			var nowspan = document.getElementById("count-number");
+			nowspan.innerHTML = nowstr;
+			//3、使时间动起来
+			setTimeout("getnow()", 1);
+		}
+
+		var dom = document.getElementById('region_1-view');
+		var myChart = echarts.init(dom, null, {
+			renderer: 'canvas',
+			useDirtyRect: false
+		});
+		var app = {};
+		var option;
+
+		let base = new Date();
+		let oneDay = 1000;
+		let date = [];
+		let data = [];
+		for (let i = 1; i < 20; i++) {
+			var now = new Date((base += oneDay));
+			date.push([now.getHours(), now.getMinutes() , now.getSeconds()].join('/'));
+			data.push(Math.round((Math.random() - 0.5) * 20 ));
+		}
+		option = {
+			tooltip: {
+				trigger: 'axis',
+				position: function (pt) {
+					return [pt[0], '10%'];
+				}
+			},
+			title: {
+				left: 'center',
+				text: 'Large Area Chart'
+			},
+			toolbox: {
+				feature: {
+					dataZoom: {
+						yAxisIndex: 'none'
+					},
+					restore: {},
+					saveAsImage: {}
+				}
+			},
+			xAxis: {
+				type: 'category',
+				boundaryGap: false,
+				data: date
+			},
+			yAxis: {
+				type: 'value',
+				boundaryGap: [0, '100%']
+			},
+			dataZoom: [
+				{
+					type: 'inside',
+					start: 0,
+					end: 10
+				},
+				{
+					start: 0,
+					end: 10
+				}
+			],
+			series: [
+				{
+					name: 'Fake Data',
+					type: 'line',
+					symbol: 'none',
+					sampling: 'lttb',
+					itemStyle: {
+						color: 'rgb(255, 70, 131)'
+					},
+					areaStyle: {
+						color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+							{
+								offset: 0,
+								color: 'rgb(255, 158, 68)'
+							},
+							{
+								offset: 1,
+								color: 'rgb(255, 70, 131)'
+							}
+						])
+					},
+					data: data
+				}
+			]
+		};
+
+		function push_data() {
+			var now = new Date();
+			date.push([now.getHours(), now.getMinutes() , now.getSeconds()].join('/'));
+			data.push(Math.round((Math.random() - 0.5) * 20 ));
+			myChart.setOption({
+				series: [
+					{
+						data: data
+					}
+				],
+				xAxis:{
+					data:date
+				}
+			});
+		}
+
+		setInterval("push_data()", 1000);
+
+		if (option && typeof option === 'object') {
+			myChart.setOption(option);
+		}
+
+		window.addEventListener('resize', myChart.resize);
+	</script>
+
+</body>
+
+</html>
