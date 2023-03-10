@@ -4,7 +4,8 @@
 
 <head>
 	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 	<title>地铁轨道监测</title>
 	<link rel="stylesheet" type="text/css" href="css/DemoWaveDisplay.css" />
 	<script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
@@ -55,10 +56,7 @@
 		<label class="count-number" id="count-number">0</label>
 		<div id="flexCon">
 
-			<div class="flex-row">
-				<div class="region_1-div" id="region_1-view"></div>
 
-			</div>
 
 			<div class="flex-row">
 
@@ -66,51 +64,17 @@
 
 			</div>
 
-			<div class="flex-row">
 
-				<div class="region_3-div" id="region_3-view"></div>
-
-			</div>
 
 		</div>
 
-		<div id="flexCon">
 
-			<div class="flex-row">
-
-				<div class="region_4-div" id="region_4-view"></div>
-
-			</div>
-
-			<div class="flex-row">
-
-				<div class="region_5-div" id="region_5-view"></div>
-
-			</div>
-
-			<div class="flex-row">
-
-				<div class="region_6-div" id="region_6-view"></div>
-
-			</div>
-
-		</div>
 	</div>
 
 
 	<script>
 
-		// function button_stop_clicked() {
-		// 	console.log("button_stop_clicked");
-		// }
 
-		// function button_restart_clicked() {
-		// 	console.log("button_restart_clicked");
-		// }
-
-		// function button_reset_clicked() {
-		// 	console.log("button_reset_clicked");
-		// }
 	</script>
 
 	<script type="text/javascript">
@@ -118,14 +82,32 @@
 		/******************* 获取时间 ******************/
 		var hour, minute, second, msecond;
 
-		
+
+
+		/******************* Qt response ******************/
+		function demo_wave(str) {
+			// let demo_wave1 = str["demo_wave1"];
+			let demo_wave2 = str["demo_wave2"];
+			// let demo_wave3 = str["demo_wave3"];
+			// let demo_wave4 = str["demo_wave4"];
+			// let demo_wave5 = str["demo_wave5"];
+			// let demo_wave6 = str["demo_wave6"];
+			// display_1(demo_wave1);
+			display_2(demo_wave2);
+			// display_3(demo_wave3);
+			// display_4(demo_wave4);
+			// display_5(demo_wave5);
+			// display_6(demo_wave6);
+		}
+
+
 
 		// /******************* region_2 display ******************/
-		function demo_wave(str) {
+		function display_2(str) {
 
-			var dis_len = str["dis_len"]; //  一次显示横轴长度
-			var date = []; 
-			for (let i = 0; i < dis_len; ++i) {
+			let date = [];
+			var dis_len = 1000; //  一次显示横轴长度
+			for (let i = 0; i < 1000; ++i) {
 				date.push([i]);
 			}
 
@@ -169,8 +151,8 @@
 					splitLine: {
 						show: false
 					},
-					min: -3,
-					max: 3
+					// min: -5,
+					// max: 5
 				},
 				// dataZoom: [
 				// 	{
@@ -187,27 +169,22 @@
 					{
 						name: 'Demo Data',
 						type: 'line',
-						showSymbol: 'false',
 						symbol: 'none',
-						sampling: 'average',
+						sampling: 'lttb',
 						itemStyle: {
 							color: 'yellow',
 						},
 
-						data: str["demo_wave"]
+						data: str["demo_wave2"]
 					}
 				]
 			};
-
-
 
 			if (option && typeof option === 'object') {
 				myChart.setOption(option);
 			}
 
 			window.addEventListener('resize', myChart.resize);
-
-			
 		}
 
 

@@ -3,6 +3,7 @@
 fallmap::fallmap(demowave* _demowave, int _fallmapFlashTime) :
   m_demowave(_demowave)
   ,peakNum(m_demowave->PeakNum())
+  ,lenoTime(m_demowave->Freq() * fallmapFlashTime / 1000)    //length of data in one flash
   ,fallmapFlashTime(_fallmapFlashTime)
   ,FallmapDataVec(vector<vector<float>>(Nf1))
   ,FallmapData1(vector<float>(peakNum,0))
@@ -128,6 +129,23 @@ fallmap::fallmap(demowave* _demowave, int _fallmapFlashTime) :
     FallmapDataVec[59] = FallmapData60;
 }
 
+void fallmap::run()
+{
+//    qDebug() <<"Fallmap Thread responsed !"<<endl;
+
+    //select the max result of every N1 length of data to display
+    vector<float> max_data(peakNum); //max results of data of every region
+    vector<int> max_data_index(peakNum); //the index of max results of data of every region
+
+    SelectMax(max_data, max_data_index, lenoTime);
+
+    Load_Fallmap(max_data);
+
+    Judgement(max_data, max_data_index);
+
+    PreProcess();
+}
+
 fallmap::~fallmap()
 {
     delete m_demowave;
@@ -157,36 +175,78 @@ void fallmap::SelectMax(vector<float>& max_data, vector<int>& max_data_index, in
 //    return max_data;
 }
 
-void fallmap::Judgement(vector<float>& max_data, vector<int>& max_data_index)
+void fallmap::Judgement(const vector<float>& max_data, const vector<int>& max_data_index)
 {
     /*---------------寻找当前测区位置-------------------*/
-    //select the region index of max amplitude in all regions
-    auto iterator_max_all = std::max_element(max_data.begin(),max_data.end());
+    Find_Present_Region(max_data);
 
-    present_region = iterator_max_all - max_data.begin() + 1; //the region with max amplitude
-
-//    /*---------------寻找当前测区的应变时区-------------------*/
-//    //将当前测区的应变最大值的位置前后strainRange个采样点作为应变时区存入strain_data
-//    const int strainRange = 100;
-//    //在合适的位置，不能越界
-//    if(max_data_index[present_region] >= strainRange && max_data_index[present_region] <= (max_data_index.size() - strainRange)){
-//        std::copy
-//         (
-//         m_demowave->GetDemodataArray()[present_region] + max_data_index[present_region] - strainRange,
-//         m_demowave->GetDemodataArray()[present_region] + max_data_index[present_region] + strainRange,
-//         strain_data.begin()
-//         );
-//    }
-//    else qDebug()<<"max_data_index is too front or too behind !!!"<<endl;
-
+    /*---------------故障检测-------------------*/
+    Fault_Detection(present_region, max_data);
 //    m_fault_detection = new Fault_detection(strain_data,2*strainRange);
 //    if(!m_fault_detection->isRunning()) m_fault_detection->start();
 
-    /*---------------当前测区是否异常判断-------------------*/
-//    IsFault = m_fault_detection->GetIsFault();
+}
 
-//    max_amplitude_all = *iterator_max_all; //max amplitude of all regions
-//    if(max_amplitude_all > 4) IsNormal = false; //statement detection
+
+void fallmap::Load_Fallmap(vector<float>& max_data)
+{
+    //copy the data of the last vector to the present vector
+    for(int i=Nf1-1; i>0; --i){
+        std::copy(FallmapDataVec[i-1].begin(),FallmapDataVec[i-1].end(),FallmapDataVec[i].begin());
+    }
+    //copy into the first vector
+    std::copy(max_data.begin(), max_data.end(), FallmapDataVec[0].begin());
+}
+
+void fallmap::Find_Present_Region(const vector<float>& max_data)
+{
+    //select the region index of max amplitude in all regions
+    auto iterator_max_all = std::max_element(max_data.begin(),max_data.end());
+
+    if(*iterator_max_all > BASE) //only if max result > BASE, finding the present region
+        present_region = iterator_max_all - max_data.begin() + 1;
+
+//    //let region changes contineuiously
+//    if(present_region == temp_region+1/* || present_region == temp_region-1 */|| present_region == temp_region-13)
+//        temp_region = present_region;
+    temp_region = present_region;
+
+    m_demowave->regionIndex = temp_region-1;
+
+    QJsonArray PresentRegion_json;
+//    present_region = 25; //test
+    PresentRegion_json.push_back(temp_region);
+
+    judgement_obj.insert("present_region",PresentRegion_json);
+}
+
+void fallmap::Fault_Detection(const int present_region, const vector<float>& max_data)
+{
+    // If time domain max amplitude of the present region is large than 6 rad,
+    // we assume the region is FAULT
+    if(max_data[present_region-1] > LIMIT) IsFault = 1;
+    else IsFault = 0;
+//    IsFault = 0; //test
+    QJsonArray IsFault_json;
+    IsFault_json.push_back(IsFault);
+    judgement_obj.insert("IsFault",IsFault_json);
+}
+
+void fallmap::Find_Range()
+{
+    //    /*---------------寻找当前测区的应变时区-------------------*/
+    //    //将当前测区的应变最大值的位置前后strainRange个采样点作为应变时区存入strain_data
+    //    const int strainRange = 100;
+    //    //在合适的位置，不能越界
+    //    if(max_data_index[present_region] >= strainRange && max_data_index[present_region] <= (max_data_index.size() - strainRange)){
+    //        std::copy
+    //         (
+    //         m_demowave->GetDemodataArray()[present_region] + max_data_index[present_region] - strainRange,
+    //         m_demowave->GetDemodataArray()[present_region] + max_data_index[present_region] + strainRange,
+    //         strain_data.begin()
+    //         );
+    //    }
+    //    else qDebug()<<"max_data_index is too front or too behind !!!"<<endl;
 }
 
 void fallmap::PreProcess()
@@ -374,36 +434,4 @@ void fallmap::PreProcess()
     fallmap_obj.insert("fallmap_data_58",fallmap_json58);
     fallmap_obj.insert("fallmap_data_59",fallmap_json59);
     fallmap_obj.insert("fallmap_data_60",fallmap_json60);
-}
-
-void fallmap::run()
-{
-    qDebug() <<"Fallmap Thread responsed !"<<endl;
-
-    //copy the data of the last vector to the present vector
-    for(int i=Nf1-1; i>0; --i){
-        std::copy(FallmapDataVec[i-1].begin(),FallmapDataVec[i-1].end(),FallmapDataVec[i].begin());
-    }
-
-    //select the max result of every N1 length of data to display
-    int len = m_demowave->Freq() * fallmapFlashTime / 1000; //length of data in one flash
-
-    vector<float> max_data(peakNum); //max results of data of every region
-    vector<int> max_data_index(peakNum); //the index of max results of data of every region
-
-    SelectMax(max_data, max_data_index, len);
-
-    //copy into the first vector
-    std::copy(max_data.begin(), max_data.end(), FallmapDataVec[0].begin());
-
-    Judgement(max_data, max_data_index);
-
-    PreProcess();
-
-    QJsonArray PresentRegion_json, IsNormal_json;
-    present_region = 25;
-    PresentRegion_json.push_back(present_region);
-    IsNormal_json.push_back(IsFault);
-    judgement_obj.insert("present_region",PresentRegion_json);
-    judgement_obj.insert("IsNormal",IsNormal_json);
 }

@@ -94,13 +94,13 @@
 			</div>
 
 			<div class="flex-row">
-				<!-- <div class="label" id="label1">测区号</div> -->
+				<div class="label" id="label1">测区号</div>
 				<div class="region_3-div" id="label1_box"><span id="region"></span></div>
 
 				<div class="region_2-div" id="region_2-view"></div>
 
-				<!-- <div class="label" id="label2">状态</div> -->
-				<div class="region_4-div" id="label2_box"><span id="is_normal></span></div>
+				<div class="label" id="label2">状态</div>
+				<div class="region_4-div" id="label2_box"><span id="is_normal"></span></div>
 
 
 			</div>
@@ -133,13 +133,13 @@
 	<script type="text/javascript">
 
 		/******************* 测区判断 ******************/
-		// function judgement(str){
+		// function judgement_(str){
 		// 	var region = document.getElementById('region');
 		// 	region.innerHTML=str["present_region"];
 		// 	var is_normal= document.getElementById('is_normal');
 		// 	is_normal.innerHTML=str["IsNormal"];
 			
-		// }
+	
 
 
 		/******************* 测区判断 ******************/
@@ -174,9 +174,37 @@
 		document.getElementById('t28').style.visibility = "hidden";
 		document.getElementById('t29').style.visibility = "hidden";
 		document.getElementById('t30').style.visibility = "hidden";
+		
 		function judgement_flash(str){
+			var region = document.getElementById('region');
+			region.innerHTML = str["present_region"];
+			// let region_data=[];
+			// var n=0;
+			// region_data.push(3);
+			// var region = document.getElementById('region');
+			// region_data.push(str["present_region"]);
+			// n=n+1;
+			// if(region_data[n] == region_data[n-1]-1 || region_data[n] == region_data[n-1]+1){
+			// 	region.innerHTML = region_data[n];
+				
+			// }
+			// else{
+			// 	region.innerHTML = region_data[n-1];
+			// 	region_data[n]=region_data[n-1];
+			// }	
 			
+			var is_normal= document.getElementById('is_normal');
+			var flag = str["IsFault"];
+			if(flag == 1 ){
+				is_normal.innerHTML='故障';
+			}
+			else is_normal.innerHTML='正常';
+		
+			
+
+
 			for(i=1;i<31;i++){
+
 				document.getElementById("t"+i.toString()).style.visibility = "hidden";
 			}
 			document.getElementById("t"+str['present_region'].toString()).style.visibility = "visible";
@@ -216,7 +244,7 @@
 				},
 				title: {
 					left: 'center',
-					text: 'region2'
+					text: 'Present Region'
 				},
 				toolbox: {
 					feature: {
@@ -238,8 +266,8 @@
 					splitLine: {
 						show: false
 					},
-					min: -3,
-					max: 3
+					min: -12,
+					max: 12
 				},
 				// dataZoom: [
 				// 	{
@@ -618,7 +646,7 @@
 					position: 'top'
 				},
 				grid: {
-					height: '50%',
+					height: '100%',
 					top: '10%'
 				},
 				xAxis: {
@@ -637,11 +665,11 @@
 				},
 				visualMap: {
 					min: 0,
-					max: 10,
+					max: 30,
 					calculable: true,
 					orient: 'horizontal',
 					left: 'center',
-					bottom: '15%',
+					top: '10%',
 					inRange: {
 						color: [
 							'#313695',

@@ -109,6 +109,10 @@ body {
 	bottom:23%;
 	left:17%;
 	right:76%;
+	text-align:center;
+	font-size:32px;
+	font-weight:400;
+	color:#bef2ff;
 	border-style:solid;
 	border-width:26px 27px 27px;
 	border-image:url("../img/chart-wrapper.png") 26 27 27 fill / 1 / 0 repeat;
@@ -119,6 +123,9 @@ body {
 	bottom:23%;
 	left:76%;
 	right:17%;
+	font-size:32px;
+	font-weight:400;
+	color:#bef2ff;
 	border-style:solid;
 	border-width:26px 27px 27px;
 	border-image:url("../img/chart-wrapper.png") 26 27 27 fill / 1 / 0 repeat;

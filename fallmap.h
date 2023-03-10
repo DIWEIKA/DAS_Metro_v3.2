@@ -1,12 +1,23 @@
 #ifndef FALLMAP_H
 #define FALLMAP_H
 
+/**
+1. fallmap滚动加载
+2. Find & Select Max Data of all DemoData
+3. 判定：测区位置判定；寻找应变时区；是否异常判定
+4. fallmap显示预处理：将数据存入JSON
+5. fault detection: 轨道故障；列车故障
+*/
+
 #include <QObject>
 #include <QThread>
 #include "demowave.h"
 #include "fault_detection.h"
 
 #define Nf1 60 //fallmap xaxis length
+#define BASE 0.1 //region find upper limit (rad)
+#define LIMIT 10 //fault detection upper limit (rad)
+
 
 class demowave;
 class Fault_detection;
@@ -21,13 +32,17 @@ public:
     vector<vector<float>>& GetFallmapDataVec(){return FallmapDataVec;}
     float GetMaxAmplitudeAll() const {return max_amplitude_all;}
     int GetPresentRegion() const {return present_region;}
-    bool GetIsFault() const {return IsFault;}
+    int GetIsFault() const {return IsFault;}
     QJsonObject& GetFallmapObj() {return fallmap_obj;}
     void SelectMax(vector<float>& max_data, vector<int>& max_data_index, int len);
-    void Judgement(vector<float>& max_data, vector<int>& max_data_index);
+    void Judgement(const vector<float>& max_data, const vector<int>& max_data_index);
     void PreProcess();
     QJsonObject& GetJudgementObj() {return judgement_obj;}
     vector<float>& GetStrainData() {return strain_data;}
+    void Load_Fallmap(vector<float>& max_data);
+    void Find_Present_Region(const vector<float>& max_data);
+    void Fault_Detection(const int present_region, const vector<float>& max_data);
+    void Find_Range();
 
 private:
 
@@ -38,9 +53,11 @@ private:
     QJsonObject judgement_obj;
     float max_amplitude_all = 0.0; //所有测区中信号最最强值
     int present_region = 1; //当前信号最强的测区号
-    bool IsFault = false; //当前测区号对应的测区状态是否正常
+    int IsFault = 0; //当前测区号对应的测区状态是否正常
+    int lenoTime; //1s数据长度
     vector<float> strain_data; //当前测区对应的应变时区的数据
     Fault_detection* m_fault_detection;
+    int temp_region = 1;
 
     //Save fallmap data
     vector<vector<float>> FallmapDataVec;

@@ -93,9 +93,9 @@ void demowave::run()
     }
     QJsonArray demo_wave_json, dis_len_json;
 
-    regionIndex = 1; //test
-    one_dis_len = 1000; //test
-    for(int i = 0; i<one_dis_len; i++){
+//    regionIndex = 1; //test
+//    one_dis_len = 1000; //test
+    for(int i = 0; i<one_dis_len; i++){  
         demo_wave_json.push_back(DemodataArray[regionIndex][i]);
     }
 

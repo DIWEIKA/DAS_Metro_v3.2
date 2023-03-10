@@ -24,12 +24,13 @@ public:
     const int Freq() const {return freq;}
     QJsonObject& GetDemoWaveObj() {return demo_wave_obj;}
 
+    int regionIndex;
 
 private:
     Demodulation* m_demodulation;
     int peakNum;
     int freq;
-    int regionIndex;
+
     int maxAmplitude;
     bool isNormal;
 

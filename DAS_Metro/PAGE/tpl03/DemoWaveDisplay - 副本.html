@@ -17,7 +17,7 @@
 	<!-- <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script> -->
 </head>
 
-<body id="body" >
+<body id="body">
 	<header id="header">
 		<h3 class="header-title">解调波形显示</h3>
 	</header>
@@ -56,10 +56,7 @@
 		<label class="count-number" id="count-number">0</label>
 		<div id="flexCon">
 
-			<div class="flex-row">
-				<div class="region_1-div" id="region_1-view"></div>
-
-			</div>
+			
 
 			<div class="flex-row">
 
@@ -67,35 +64,11 @@
 
 			</div>
 
-			<div class="flex-row">
-
-				<div class="region_3-div" id="region_3-view"></div>
-
-			</div>
+			
 
 		</div>
 
-		<div id="flexCon">
-
-			<div class="flex-row">
-
-				<div class="region_4-div" id="region_4-view"></div>
-
-			</div>
-
-			<div class="flex-row">
-
-				<div class="region_5-div" id="region_5-view"></div>
-
-			</div>
-
-			<div class="flex-row">
-
-				<div class="region_6-div" id="region_6-view"></div>
-
-			</div>
-
-		</div>
+		
 	</div>
 
 
@@ -120,648 +93,113 @@
 		var hour, minute, second, msecond;
 
 		let date = [];
-		var dis_len = 10000; //  一次显示横轴长度
-		for(let i=0; i<dis_len; ++i){
-				date.push([i]);
-			}
-		// function get_len(str){
-		// 	var dis_len = str["dis_len"];
-		// 	var now = new Date();
-		// 	for(let i=0; i<dis_len; ++i){
-		// 		date.push([i]);
-		// 	}
-			
-		// }
+		var dis_len = 1000; //  一次显示横轴长度
+		for (let i = 0; i < dis_len; ++i) {
+			date.push([i]);
+		}
 
-		// /******************* region_1 display ******************/
-		// function demo_wave1(str) {
-		// 	var dom1 = document.getElementById('region_1-view');
-		// 	var myChart1 = echarts.init(dom1, null, {
-		// 		renderer: 'canvas',
-		// 		useDirtyRect: false
-		// 	});
-		// 	var app1 = {};
-		// 	var option1;
-		// 	let base1 = +new Date();
-		// 	// let oneDay = 24 * 3600 * 1000;
-		// 	let oneMSecond1 = 1;
-		// 	// let date = [];
-		// 	let data1 = [];
-		// 	// var len = str["dis_len"];
-		// 	// for (let i = 0; i < len; i++) {
-		// 	// 	date.push([i]);
-		// 	// }
-
-		// 	option1 = {
-		// 		animation: false,
-		// 		tooltip: {
-		// 			trigger: 'axis',
-		// 			position: function (pt) {
-		// 				return [pt[0], '10%'];
-		// 			}
-		// 		},
-		// 		title: {
-		// 			left: 'center',
-		// 			text: '区域1时域信号'
-		// 		},
-		// 		toolbox: {
-		// 			feature: {
-		// 				dataZoom: {
-		// 					yAxisIndex: 'none'
-		// 				},
-		// 				restore: {},
-		// 				saveAsImage: {}
-		// 			}
-		// 		},
-		// 		xAxis: {
-		// 			type: 'category',
-		// 			boundaryGap: false,
-		// 			data: date
-		// 		},
-		// 		yAxis: {
-		// 			type: 'value',
-		// 			splitLine: {
-		// 				show: false
-		// 			},
-		// 			min: -2,
-		// 			max: 2,
-		// 			boundaryGap: [0, '100%']
-		// 		},
-		// 		// dataZoom: [
-		// 		// 	{
-		// 		// 		type: 'inside',
-		// 		// 		start: 0,
-		// 		// 		end: 10
-		// 		// 	},
-		// 		// 	{
-		// 		// 		start: 0,
-		// 		// 		end: 10
-		// 		// 	}
-		// 		// ],
-		// 		series: [
-		// 			{
-		// 				name: 'Fake Data',
-		// 				type: 'line',
-		// 				// symbol: 'none',
-		// 				showSymbol: false,
-		// 				// sampling: 'lttb',
-		// 				itemStyle: {
-		// 					color: 'rgb(255, 70, 131)'
-		// 				},
-						
-		// 				data: str["demo_wave1"]
-		// 			}
-		// 		]
-		// 	};
-		// 	if (option1 && typeof option1 === 'object') {
-		// 		myChart1.setOption(option1);
-		// 	}
-
-		// 	window.addEventListener('resize', myChart1.resize);
-		// }
-
-
-		// /******************* region_2 display ******************/
+		/******************* Qt response ******************/
 		function demo_wave(str) {
-
-				var dom = document.getElementById("region_2-view");
-				var myChart = echarts.init(dom, null, {
-					renderer: 'canvas',
-					useDirtyRect: false
-				});
-				// var app = {};
-
-				var option;
-				// let xdata = [];
-				// let ydata = [];
-				// var N1;  //  采样时间点
-				// N1 = str["N1"];
-				// // ydata = str["demo_wave"];
-
-				// for (let i = 0; i < N1; i++) {
-				// 	xdata.push([i]);
-				// }
-				option = {
-					animation: false,
-					tooltip: {
-						trigger: 'axis',
-						position: function (pt) {
-							return [pt[0], '10%'];
-						}
-					},
-					// title: {
-					// 	left: 'center',
-					// 	text: '通道1'
-					// },
-					toolbox: {
-						feature: {
-							dataZoom: {
-								yAxisIndex: 'none'
-							},
-							restore: {},
-							saveAsImage: {}
-						}
-					},
-					xAxis: {
-						type: 'category',
-						boundaryGap: false,
-						data: date,
-					},
-					yAxis: {
-						type: 'value',
-						// boundaryGap: [0, '100%'],
-						splitLine: {
-							show: false
-						},
-						min:-3,
-						max:3
-					},
-					// dataZoom: [
-					// 	{
-					// 		type: 'inside',
-					// 		start: 0,
-					// 		end: 10
-					// 	},
-					// 	{
-					// 		start: 0,
-					// 		end: 10
-					// 	}
-					// ],
-					series: [
-						{
-							name: 'Demo Data',
-							type: 'line',
-							symbol: 'none',
-							sampling: 'lttb',
-							itemStyle: {
-								color: 'yellow',
-							},
-							// areaStyle: {
-							// 	color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-							// 		{
-							// 			offset: 0,
-							// 			color: 'rgb(139, 58, 169)'
-							// 		},
-							// 		{
-							// 			offset: 1,
-							// 			color: 'rgb(139, 58, 169)'
-							// 		}
-							// 	])
-							// },
-							data: str["demo_wave2"]
-						}
-					]
-				};
-
-				if (option && typeof option === 'object') {
-					myChart.setOption(option);
-				}
-
-				window.addEventListener('resize', myChart.resize);
-			}
-		// function demo_wave2(str) {
-		// 	var dom = document.getElementById('region_2-view');
-		// 	var myChart = echarts.init(dom, null, {
-		// 		renderer: 'canvas',
-		// 		useDirtyRect: false
-		// 	});
-		// 	var app = {};
-		// 	var option;
-		// 	let base = +new Date();
-		// 	// let oneDay = 24 * 3600 * 1000;
-		// 	let oneMSecond = 1;
-		// 	// let date = [];
-		// 	let data = [];
-		// 	// var len = str["dis_len"];
-		// 	// for (let i = 0; i < len; i++) {
-		// 	// 	date.push([i]);
-		// 	// }
-
-		// 	option = {
-		// 		animation: false,
-		// 		tooltip: {
-		// 			trigger: 'axis',
-		// 			position: function (pt) {
-		// 				return [pt[0], '10%'];
-		// 			}
-		// 		},
-		// 		title: {
-		// 			left: 'center',
-		// 			text: '区域2时域信号'
-		// 		},
-		// 		toolbox: {
-		// 			feature: {
-		// 				dataZoom: {
-		// 					yAxisIndex: 'none'
-		// 				},
-		// 				restore: {},
-		// 				saveAsImage: {}
-		// 			}
-		// 		},
-		// 		xAxis: {
-		// 			type: 'category',
-		// 			boundaryGap: false,
-		// 			data: date
-		// 		},
-		// 		yAxis: {
-		// 			type: 'value',
-		// 			splitLine: {
-		// 				show: false
-		// 			},
-		// 			min: -2,
-		// 			max: 2,
-		// 			boundaryGap: [0, '100%']
-		// 		},
-		// 		// dataZoom: [
-		// 		// 	{
-		// 		// 		type: 'inside',
-		// 		// 		start: 0,
-		// 		// 		end: 10
-		// 		// 	},
-		// 		// 	{
-		// 		// 		start: 0,
-		// 		// 		end: 10
-		// 		// 	}
-		// 		// ],
-		// 		series: [
-		// 			{
-		// 				name: 'Fake Data',
-		// 				type: 'line',
-		// 				// symbol: 'none',
-		// 				showSymbol: false,
-		// 				// sampling: 'lttb',
-		// 				itemStyle: {
-		// 					color: 'rgb(255, 70, 131)'
-		// 				},
-						
-		// 				data: str["demo_wave2"]
-		// 			}
-		// 		]
-		// 	};
-		// 	if (option && typeof option === 'object') {
-		// 		myChart.setOption(option);
-		// 	}
-
-		// 	window.addEventListener('resize', myChart.resize);
-		// }
-
-
-		// // /******************* region_3 display ******************/
-		// function demo_wave3(str) {
-		// 	var dom = document.getElementById('region_3-view');
-		// 	var myChart = echarts.init(dom, null, {
-		// 		renderer: 'canvas',
-		// 		useDirtyRect: false
-		// 	});
-		// 	var app = {};
-		// 	var option;
-		// 	let base = +new Date();
-		// 	// let oneDay = 24 * 3600 * 1000;
-		// 	let oneMSecond = 1;
-		// 	// let date = [];
-		// 	let data = [];
-		// 	// var len = str["dis_len"];
-		// 	// for (let i = 0; i < len; i++) {
-		// 	// 	date.push([i]);
-		// 	// }
-
-		// 	option = {
-		// 		animation: false,
-		// 		tooltip: {
-		// 			trigger: 'axis',
-		// 			position: function (pt) {
-		// 				return [pt[0], '10%'];
-		// 			}
-		// 		},
-		// 		title: {
-		// 			left: 'center',
-		// 			text: '区域3时域信号'
-		// 		},
-		// 		toolbox: {
-		// 			feature: {
-		// 				dataZoom: {
-		// 					yAxisIndex: 'none'
-		// 				},
-		// 				restore: {},
-		// 				saveAsImage: {}
-		// 			}
-		// 		},
-		// 		xAxis: {
-		// 			type: 'category',
-		// 			boundaryGap: false,
-		// 			data: date
-		// 		},
-		// 		yAxis: {
-		// 			type: 'value',
-		// 			splitLine: {
-		// 				show: false
-		// 			},
-		// 			min: -2,
-		// 			max: 2,
-		// 			boundaryGap: [0, '100%']
-		// 		},
-		// 		// dataZoom: [
-		// 		// 	{
-		// 		// 		type: 'inside',
-		// 		// 		start: 0,
-		// 		// 		end: 10
-		// 		// 	},
-		// 		// 	{
-		// 		// 		start: 0,
-		// 		// 		end: 10
-		// 		// 	}
-		// 		// ],
-		// 		series: [
-		// 			{
-		// 				name: 'Fake Data',
-		// 				type: 'line',
-		// 				// symbol: 'none',
-		// 				showSymbol: false,
-		// 				// sampling: 'lttb',
-		// 				itemStyle: {
-		// 					color: 'rgb(255, 70, 131)'
-		// 				},
-						
-		// 				data: str["demo_wave3"]
-		// 			}
-		// 		]
-		// 	};
-		// 	if (option && typeof option === 'object') {
-		// 		myChart.setOption(option);
-		// 	}
-
-		// 	window.addEventListener('resize', myChart.resize);
-		// }
-
-
-		// // /******************* region_4 display ******************/
-		// function demo_wave4(str) {
-		// 	var dom = document.getElementById('region_4-view');
-		// 	var myChart = echarts.init(dom, null, {
-		// 		renderer: 'canvas',
-		// 		useDirtyRect: false
-		// 	});
-		// 	var app = {};
-		// 	var option;
-		// 	let base = +new Date();
-		// 	// let oneDay = 24 * 3600 * 1000;
-		// 	let oneMSecond = 1;
-		// 	// let date = [];
-		// 	let data = [];
-		// 	// var len = str["dis_len"];
-		// 	// for (let i = 0; i < len; i++) {
-		// 	// 	date.push([i]);
-		// 	// }
-
-		// 	option = {
-		// 		animation: false,
-		// 		tooltip: {
-		// 			trigger: 'axis',
-		// 			position: function (pt) {
-		// 				return [pt[0], '10%'];
-		// 			}
-		// 		},
-		// 		title: {
-		// 			left: 'center',
-		// 			text: '区域4时域信号'
-		// 		},
-		// 		toolbox: {
-		// 			feature: {
-		// 				dataZoom: {
-		// 					yAxisIndex: 'none'
-		// 				},
-		// 				restore: {},
-		// 				saveAsImage: {}
-		// 			}
-		// 		},
-		// 		xAxis: {
-		// 			type: 'category',
-		// 			boundaryGap: false,
-		// 			data: date
-		// 		},
-		// 		yAxis: {
-		// 			type: 'value',
-		// 			splitLine: {
-		// 				show: false
-		// 			},
-		// 			min: -2,
-		// 			max: 2,
-		// 			boundaryGap: [0, '100%']
-		// 		},
-		// 		// dataZoom: [
-		// 		// 	{
-		// 		// 		type: 'inside',
-		// 		// 		start: 0,
-		// 		// 		end: 10
-		// 		// 	},
-		// 		// 	{
-		// 		// 		start: 0,
-		// 		// 		end: 10
-		// 		// 	}
-		// 		// ],
-		// 		series: [
-		// 			{
-		// 				name: 'Fake Data',
-		// 				type: 'line',
-		// 				// symbol: 'none',
-		// 				showSymbol: false,
-		// 				// sampling: 'lttb',
-		// 				itemStyle: {
-		// 					color: 'rgb(255, 70, 131)'
-		// 				},
-						
-		// 				data: str["demo_wave4"]
-		// 			}
-		// 		]
-		// 	};
-		// 	if (option && typeof option === 'object') {
-		// 		myChart.setOption(option);
-		// 	}
-
-		// 	window.addEventListener('resize', myChart.resize);
-		// }
-
-
-		// // /******************* region_5 display ******************/
-		// function demo_wave5(str) {
-		// 	var dom = document.getElementById('region_5-view');
-		// 	var myChart = echarts.init(dom, null, {
-		// 		renderer: 'canvas',
-		// 		useDirtyRect: false
-		// 	});
-		// 	var app = {};
-		// 	var option;
-		// 	let base = +new Date();
-		// 	// let oneDay = 24 * 3600 * 1000;
-		// 	let oneMSecond = 1;
-		// 	// let date = [];
-		// 	let data = [];
-		// 	// var len = str["dis_len"];
-		// 	// for (let i = 0; i < len; i++) {
-		// 	// 	date.push([i]);
-		// 	// }
-
-		// 	option = {
-		// 		animation: false,
-		// 		tooltip: {
-		// 			trigger: 'axis',
-		// 			position: function (pt) {
-		// 				return [pt[0], '10%'];
-		// 			}
-		// 		},
-		// 		title: {
-		// 			left: 'center',
-		// 			text: '区域5时域信号'
-		// 		},
-		// 		toolbox: {
-		// 			feature: {
-		// 				dataZoom: {
-		// 					yAxisIndex: 'none'
-		// 				},
-		// 				restore: {},
-		// 				saveAsImage: {}
-		// 			}
-		// 		},
-		// 		xAxis: {
-		// 			type: 'category',
-		// 			boundaryGap: false,
-		// 			data: date
-		// 		},
-		// 		yAxis: {
-		// 			type: 'value',
-		// 			splitLine: {
-		// 				show: false
-		// 			},
-		// 			min: -2,
-		// 			max: 2,
-		// 			boundaryGap: [0, '100%']
-		// 		},
-		// 		// dataZoom: [
-		// 		// 	{
-		// 		// 		type: 'inside',
-		// 		// 		start: 0,
-		// 		// 		end: 10
-		// 		// 	},
-		// 		// 	{
-		// 		// 		start: 0,
-		// 		// 		end: 10
-		// 		// 	}
-		// 		// ],
-		// 		series: [
-		// 			{
-		// 				name: 'Fake Data',
-		// 				type: 'line',
-		// 				// symbol: 'none',
-		// 				showSymbol: false,
-		// 				// sampling: 'lttb',
-		// 				itemStyle: {
-		// 					color: 'rgb(255, 70, 131)'
-		// 				},
-						
-		// 				data: str["demo_wave5"]
-		// 			}
-		// 		]
-		// 	};
-		// 	if (option && typeof option === 'object') {
-		// 		myChart.setOption(option);
-		// 	}
-
-		// 	window.addEventListener('resize', myChart.resize);
-		// }
-
-
-
-
-		// // /******************* region_6 display ******************/
-		// function demo_wave6(str) {
-		// 	var dom = document.getElementById('region_6-view');
-		// 	var myChart = echarts.init(dom, null, {
-		// 		renderer: 'canvas',
-		// 		useDirtyRect: false
-		// 	});
-		// 	var app = {};
-		// 	var option;
-		// 	let base = +new Date();
-		// 	// let oneDay = 24 * 3600 * 1000;
-		// 	let oneMSecond = 1;
-		// 	// let date = [];
-		// 	let data = [];
-		// 	// var len = str["dis_len"];
-		// 	// for (let i = 0; i < len; i++) {
-		// 	// 	date.push([i]);
-		// 	// }
-
-		// 	option = {
-		// 		animation: false,
-		// 		tooltip: {
-		// 			trigger: 'axis',
-		// 			position: function (pt) {
-		// 				return [pt[0], '10%'];
-		// 			}
-		// 		},
-		// 		title: {
-		// 			left: 'center',
-		// 			text: '区域6时域信号'
-		// 		},
-		// 		toolbox: {
-		// 			feature: {
-		// 				dataZoom: {
-		// 					yAxisIndex: 'none'
-		// 				},
-		// 				restore: {},
-		// 				saveAsImage: {}
-		// 			}
-		// 		},
-		// 		xAxis: {
-		// 			type: 'category',
-		// 			boundaryGap: false,
-		// 			data: date
-		// 		},
-		// 		yAxis: {
-		// 			type: 'value',
-		// 			splitLine: {
-		// 				show: false
-		// 			},
-		// 			min: -2,
-		// 			max: 2,
-		// 			boundaryGap: [0, '100%']
-		// 		},
-		// 		// dataZoom: [
-		// 		// 	{
-		// 		// 		type: 'inside',
-		// 		// 		start: 0,
-		// 		// 		end: 10
-		// 		// 	},
-		// 		// 	{
-		// 		// 		start: 0,
-		// 		// 		end: 10
-		// 		// 	}
-		// 		// ],
-		// 		series: [
-		// 			{
-		// 				name: 'Fake Data',
-		// 				type: 'line',
-		// 				// symbol: 'none',
-		// 				showSymbol: false,
-		// 				// sampling: 'lttb',
-		// 				itemStyle: {
-		// 					color: 'rgb(255, 70, 131)'
-		// 				},
-						
-		// 				data: str["demo_wave6"]
-		// 			}
-		// 		]
-		// 	};
-		// 	if (option && typeof option === 'object') {
-		// 		myChart.setOption(option);
-		// 	}
-
-		// 	window.addEventListener('resize', myChart.resize);
-		// }
-
-
+			// let demo_wave1 = str["demo_wave1"];
+			let demo_wave2 = str["demo_wave2"];
+			// let demo_wave3 = str["demo_wave3"];
+			// let demo_wave4 = str["demo_wave4"];
+			// let demo_wave5 = str["demo_wave5"];
+			// let demo_wave6 = str["demo_wave6"];
+			// display_1(demo_wave1);
+			display_2(demo_wave2);
+			// display_3(demo_wave3);
+			// display_4(demo_wave4);
+			// display_5(demo_wave5);
+			// display_6(demo_wave6);
+		}
 
 		
+
+		// /******************* region_2 display ******************/
+		function display_2(data) {
+
+			var dom = document.getElementById("region_2-view");
+			var myChart = echarts.init(dom, null, {
+				renderer: 'canvas',
+				useDirtyRect: false
+			});
+
+			var option;
+
+			option = {
+				animation: false,
+				tooltip: {
+					trigger: 'axis',
+					position: function (pt) {
+						return [pt[0], '10%'];
+					}
+				},
+				title: {
+					left: 'center',
+					text: 'region2'
+				},
+				toolbox: {
+					feature: {
+						dataZoom: {
+							yAxisIndex: 'none'
+						},
+						restore: {},
+						saveAsImage: {}
+					}
+				},
+				xAxis: {
+					type: 'category',
+					boundaryGap: false,
+					data: date,
+				},
+				yAxis: {
+					type: 'value',
+					boundaryGap: [0, '100%'],
+					splitLine: {
+						show: false
+					},
+					min: -1,
+					max: 1
+				},
+				// dataZoom: [
+				// 	{
+				// 		type: 'inside',
+				// 		start: 0,
+				// 		end: 10
+				// 	},
+				// 	{
+				// 		start: 0,
+				// 		end: 10
+				// 	}
+				// ],
+				series: [
+					{
+						name: 'Demo Data',
+						type: 'line',
+						symbol: 'none',
+						sampling: 'lttb',
+						itemStyle: {
+							color: 'yellow',
+						},
+
+						data: data
+					}
+				]
+			};
+
+			if (option && typeof option === 'object') {
+				myChart.setOption(option);
+			}
+
+			window.addEventListener('resize', myChart.resize);
+		}
+
+		
+
+
+
+
 	</script>
 
 </body>
