@@ -3,8 +3,8 @@
 fallmap::fallmap(demowave* _demowave, int _fallmapFlashTime) :
   m_demowave(_demowave)
   ,peakNum(m_demowave->PeakNum())
-  ,lenoTime(m_demowave->Freq() * fallmapFlashTime / 1000)    //length of data in one flash
   ,fallmapFlashTime(_fallmapFlashTime)
+  ,lenoTime(m_demowave->Freq() * fallmapFlashTime / 1000)//length of data in one flash
   ,FallmapDataVec(vector<vector<float>>(Nf1))
   ,FallmapData1(vector<float>(peakNum,0))
   ,FallmapData2(vector<float>(peakNum,0))
@@ -66,6 +66,7 @@ fallmap::fallmap(demowave* _demowave, int _fallmapFlashTime) :
   ,FallmapData58(vector<float>(peakNum,0))
   ,FallmapData59(vector<float>(peakNum,0))
   ,FallmapData60(vector<float>(peakNum,0))
+    ,judge_q(deque<int>(5,0))
 {
     FallmapDataVec[0] = FallmapData1;
     FallmapDataVec[1] = FallmapData2;
@@ -129,6 +130,25 @@ fallmap::fallmap(demowave* _demowave, int _fallmapFlashTime) :
     FallmapDataVec[59] = FallmapData60;
 }
 
+void fallmap::InitState()
+{
+    QJsonArray IsBegin_json;
+    IsBegin_json.push_back(Begin);
+    judgement_obj.insert("IsBegin",IsBegin_json);
+}
+
+void fallmap::Begin_State_Judge(const int present_region, const vector<float>& max_data)
+{
+    judge_q.pop_front();
+    judge_q.push_back(present_region);
+    if(judge_q.size() == 5){
+        Begin = (std::equal(judge_q.begin() + 1, judge_q.end(), judge_q.begin()) == true) ? 1 : 0;
+        InitState();
+    }
+
+    qDebug()<<"Begin = " << Begin <<endl;
+}
+
 void fallmap::run()
 {
 //    qDebug() <<"Fallmap Thread responsed !"<<endl;
@@ -180,8 +200,14 @@ void fallmap::Judgement(const vector<float>& max_data, const vector<int>& max_da
     /*---------------寻找当前测区位置-------------------*/
     Find_Present_Region(max_data);
 
+    /*---------------初始态判断-------------------*/
+    Begin_State_Judge(present_region, max_data);
+
     /*---------------故障检测-------------------*/
-    Fault_Detection(present_region, max_data);
+//    Fault_Detection(present_region, max_data);
+    Fault_Detection(present_region, lenoTime);
+
+
 //    m_fault_detection = new Fault_detection(strain_data,2*strainRange);
 //    if(!m_fault_detection->isRunning()) m_fault_detection->start();
 
@@ -222,14 +248,243 @@ void fallmap::Find_Present_Region(const vector<float>& max_data)
 
 void fallmap::Fault_Detection(const int present_region, const vector<float>& max_data)
 {
+    /*---------方式一：时域幅值的阈值检测-----------*/
     // If time domain max amplitude of the present region is large than 6 rad,
     // we assume the region is FAULT
-    if(max_data[present_region-1] > LIMIT) IsFault = 1;
-    else IsFault = 0;
-//    IsFault = 0; //test
-    QJsonArray IsFault_json;
-    IsFault_json.push_back(IsFault);
-    judgement_obj.insert("IsFault",IsFault_json);
+    if(abs(max_data[present_region-1]) > LIMIT) IsLineFault = 1;
+    else IsLineFault = 0;
+//    IsLineFault = 0; //test
+    QJsonArray IsLineFault_json;
+    IsLineFault_json.push_back(IsLineFault);
+    judgement_obj.insert("IsLineFault",IsLineFault_json);
+
+}
+
+void fallmap::Fault_Detection(const int present_region, int len)
+{
+    /*---------方式二：时域峰值点数的阈值检测-----------*/
+    std::vector<float> temp(len,0); //save time domain of demowave of the present region
+    std::copy(m_demowave->GetDemodataArray()[present_region-1],m_demowave->GetDemodataArray()[present_region-1]+len, temp.begin());
+    for(int i=0; i<len; ++i){
+        if(temp[i] < PEAKLIMIT) temp[i] = 0;
+    }
+    std::vector<size_t> temp_index = findPeaks(temp,0); //get the index of peaks
+
+    temp_peak_num = temp_index.size();
+//    if(++peak_cnt == 2){
+//        real_peak_num = temp_peak_num; //get the number of peaks
+//        qDebug()<<"Demowave peak number is: "<<real_peak_num<<endl;
+//        temp_peak_num = 0;
+//        peak_cnt = 0;
+//    }
+
+
+    IsLineFault = 0;
+    region_cnt++;
+
+    switch (present_region) {
+    case 1:{ if(temp_peak_num > REGION1)
+        {
+        // train_fault_cnt++;
+         line_cnt_1++;
+         if(line_cnt_1 >=LINEFAULTLIMIT ){
+             IsLineFault = 1;
+             line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_4 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;
+             qDebug()<<"---------REGION 1 of Line is Fault !!----------"<<endl;
+         }
+        }
+        if(temp_peak_num>TRAIN){
+           train_fault_cnt++;
+       }
+        qDebug()<<"REGION 1 peak number is: "<<temp_peak_num<<endl; break;}
+
+    case 2:{ if(temp_peak_num > REGION2)
+        {
+           // train_fault_cnt++;
+            line_cnt_2++;
+            if(line_cnt_2 >=LINEFAULTLIMIT ){
+                IsLineFault = 1;
+                line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_4 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;
+                qDebug()<<"---------REGION 2 of Line is Fault !!----------"<<endl;
+            }
+        }
+        if(temp_peak_num>TRAIN){
+            train_fault_cnt++;
+        }
+        qDebug()<<"REGION 2 peak number is: "<<temp_peak_num<<endl; break;}
+
+    case 3:{ if(temp_peak_num > REGION3)
+        {
+            //train_fault_cnt++;
+            line_cnt_3++;
+            if(line_cnt_3 >=LINEFAULTLIMIT ){
+                IsLineFault = 1;
+                line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_4 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;
+                qDebug()<<"---------REGION 3 of Line is Fault !!----------"<<endl;
+            }
+        }
+        if(temp_peak_num>TRAIN){
+            train_fault_cnt++;
+        }
+        qDebug()<<"REGION 3 peak number is: "<<temp_peak_num<<endl; break;}
+
+    case 4:{ if(temp_peak_num > REGION4)
+        {
+           //train_fault_cnt++;
+            line_cnt_4++;
+           if(line_cnt_4 >=LINEFAULTLIMIT ){
+               IsLineFault = 1;
+               line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;
+               qDebug()<<"---------REGION 4 of Line is Fault !!----------"<<endl;
+           }
+        }
+        if(temp_peak_num>TRAIN){
+            train_fault_cnt++;
+        }
+        qDebug()<<"REGION 4 peak number is: "<<temp_peak_num<<endl; break;}
+
+    case 5:{ if(temp_peak_num > REGION5)
+        {
+           //train_fault_cnt++;
+            line_cnt_5++;
+           if(line_cnt_5 >=LINEFAULTLIMIT ){
+               IsLineFault = 1;
+               line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_4 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;
+               qDebug()<<"---------REGION 5 of Line is Fault !!----------"<<endl;
+           }
+        }
+        if(temp_peak_num>TRAIN){
+            train_fault_cnt++;
+        }
+        qDebug()<<"REGION 5 peak number is: "<<temp_peak_num<<endl; break;}
+
+    case 6:{ if(temp_peak_num > REGION6)
+        {
+          // train_fault_cnt++;
+            line_cnt_6++;
+           if(line_cnt_6 >=LINEFAULTLIMIT ){
+               IsLineFault = 1;
+               line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_4 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;
+               qDebug()<<"---------REGION 6 of Line is Fault !!----------"<<endl;
+           }
+        }
+        if(temp_peak_num>TRAIN){
+            train_fault_cnt++;
+        }
+        qDebug()<<"REGION 6 peak number is: "<<temp_peak_num<<endl; break;}
+
+    case 7:{ if(temp_peak_num > REGION7)
+        {
+          // train_fault_cnt++;
+            line_cnt_7++;
+           if(line_cnt_7 >=LINEFAULTLIMIT ){
+               IsLineFault = 1;
+               line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_4 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;
+               qDebug()<<"---------REGION 7 of Line is Fault !!----------"<<endl;
+           }
+        }
+        if(temp_peak_num>TRAIN){
+            train_fault_cnt++;
+        }
+        qDebug()<<"REGION 7 peak number is: "<<temp_peak_num<<endl; break;}
+
+    case 8:{ if(temp_peak_num > REGION8)
+        {
+          // train_fault_cnt++;
+            line_cnt_8++;
+           if(line_cnt_8 >=LINEFAULTLIMIT ){
+               IsLineFault = 1;
+               line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_4 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;
+               qDebug()<<"---------REGION 8 of Line is Fault !!----------"<<endl;
+           }
+        }
+        if(temp_peak_num>TRAIN){
+            train_fault_cnt++;
+        }
+        qDebug()<<"REGION 8 peak number is: "<<temp_peak_num<<endl; break;}
+
+    case 9:{ if(temp_peak_num > REGION9)
+        {
+          // train_fault_cnt++;
+            line_cnt_9++;
+           if(line_cnt_9 >=LINEFAULTLIMIT ){
+               IsLineFault = 1;
+               line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_4 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;
+               qDebug()<<"---------REGION 9 of Line is Fault !!----------"<<endl;
+           }
+        }
+        if(temp_peak_num>TRAIN){
+            train_fault_cnt++;
+        }
+        qDebug()<<"REGION 9 peak number is: "<<temp_peak_num<<endl; break;}
+
+    }
+  /*  if(pre_region==present_region)
+        pre_region_cnt++;
+    pre_region = present_region;*/
+     //如果经过8个测区（一圈）且测区故障数大于5时，判定为列车故障
+   if(region_cnt == 8){
+       //Begin = 1;
+       if(train_fault_cnt >= 5){
+             IsTrainFault = 1;
+             region_cnt = 0;
+             if(pre_train_fault_cnt == train_fault_cnt){
+                 train_fault_cnt = 0;
+                 line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_4 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;
+                 IsTrainFault = 0;
+            }
+              pre_train_fault_cnt = train_fault_cnt;
+//        train_fault_cnt = 0;
+//        line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_4 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;
+             IsLineFault = 0; //如果列车故障时，轨道必正常
+                qDebug()<<"--------The Train is Fault !!!--------: "<<endl;
+    }
+        if(train_fault_cnt < 5){
+            IsTrainFault = 0;
+            region_cnt = 0;
+            train_fault_cnt = 0;
+        }
+    }
+  /* if(region_cnt == 8){
+      // Begin = 0;
+       if(train_fault_cnt >= 5){
+             IsTrainFault = 1;
+             region_cnt = 0;
+             if(pre_train_fault_cnt == train_fault_cnt){
+                 train_fault_cnt = 0;
+                 line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_4 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;
+                 IsTrainFault = 0;
+            }
+              pre_train_fault_cnt = train_fault_cnt;
+//        train_fault_cnt = 0;
+//        line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_4 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;
+             IsLineFault = 0; //如果列车故障时，轨道必正常
+                qDebug()<<"--------The Train is Fault !!!--------: "<<endl;
+    }
+        if(train_fault_cnt < 5){
+            IsTrainFault = 0;
+            region_cnt = 0;
+            train_fault_cnt = 0;
+        }
+    }*/
+    //如果8s内number总数大于某一值，判定为列车故障
+ /*   if(region_cnt<8){
+        all_num+=temp_peak_num;
+    }
+    if(region_cnt==8){
+        qDebug()<<"all_num is : "<<all_num<<endl;
+        region_cnt = 0;
+        all_num = 0;
+    }*/
+
+
+
+    QJsonArray IsLineFault_json;
+    IsLineFault_json.push_back(IsLineFault);
+    judgement_obj.insert("IsLineFault",IsLineFault_json);
+    QJsonArray IsTrainFault_json;
+    IsTrainFault_json.push_back(IsTrainFault);
+    judgement_obj.insert("IsTrainFault",IsTrainFault_json);
 }
 
 void fallmap::Find_Range()
@@ -248,6 +503,7 @@ void fallmap::Find_Range()
     //    }
     //    else qDebug()<<"max_data_index is too front or too behind !!!"<<endl;
 }
+
 
 void fallmap::PreProcess()
 {

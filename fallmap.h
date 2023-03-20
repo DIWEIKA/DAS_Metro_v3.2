@@ -13,11 +13,28 @@
 #include <QThread>
 #include "demowave.h"
 #include "fault_detection.h"
+#include "findpeaks.h"
+#include <deque>
 
 #define Nf1 60 //fallmap xaxis length
-#define BASE 0.1 //region find upper limit (rad)
-#define LIMIT 10 //fault detection upper limit (rad)
+#define BASE 8 //region find upper limit (rad)
+#define LIMIT 6 //fault detection upper limit (rad)
+#define PEAKLIMIT 0.5 //find peaks lower limit (rad)
 
+//the limit of peak numbers of demowave in time domain
+enum demowave_peak_num{
+    REGION1=100,
+    REGION2=103,
+    REGION3=110,
+    REGION4=100,
+    REGION5=100,
+    REGION6=110,
+    REGION7=110,
+    REGION8=110,
+    REGION9=110,
+    LINEFAULTLIMIT=3,
+    TRAIN=100
+};
 
 class demowave;
 class Fault_detection;
@@ -32,7 +49,7 @@ public:
     vector<vector<float>>& GetFallmapDataVec(){return FallmapDataVec;}
     float GetMaxAmplitudeAll() const {return max_amplitude_all;}
     int GetPresentRegion() const {return present_region;}
-    int GetIsFault() const {return IsFault;}
+    int GetIsLineFault() const {return IsLineFault;}
     QJsonObject& GetFallmapObj() {return fallmap_obj;}
     void SelectMax(vector<float>& max_data, vector<int>& max_data_index, int len);
     void Judgement(const vector<float>& max_data, const vector<int>& max_data_index);
@@ -41,8 +58,11 @@ public:
     vector<float>& GetStrainData() {return strain_data;}
     void Load_Fallmap(vector<float>& max_data);
     void Find_Present_Region(const vector<float>& max_data);
+    void Begin_State_Judge(const int present_region, const vector<float>& max_data);
     void Fault_Detection(const int present_region, const vector<float>& max_data);
+    void Fault_Detection(const int present_region, int len);
     void Find_Range();
+    void InitState();
 
 private:
 
@@ -53,12 +73,30 @@ private:
     QJsonObject judgement_obj;
     float max_amplitude_all = 0.0; //所有测区中信号最最强值
     int present_region = 1; //当前信号最强的测区号
-    int IsFault = 0; //当前测区号对应的测区状态是否正常
+    int IsLineFault = 0; //轨道是否故障
+    int IsTrainFault = 0; //列车是否故障
     int lenoTime; //1s数据长度
     vector<float> strain_data; //当前测区对应的应变时区的数据
     Fault_detection* m_fault_detection;
     int temp_region = 1;
-
+    int temp_peak_num = 0; //信号的peak数
+    int real_peak_num = 0; //真正的peak数
+    int region_cnt = 0; //经过测区的次数/1s刷新的次数
+    int train_fault_cnt =0; //列车故障次数
+    int pre_train_fault_cnt=0;//上次列车故障次数
+    int line_cnt_1=0; //轨道区域1异常计数
+    int line_cnt_2=0;
+    int line_cnt_3=0;
+    int line_cnt_4=0;
+    int line_cnt_5=0;
+    int line_cnt_6=0;
+    int line_cnt_7=0;
+    int line_cnt_8=0;
+    int line_cnt_9=0;
+    int all_num = 0;
+    int Begin = 0;//初始态
+    std::deque<int> judge_q; //初始态计数容器
+    //int Begin = 0;//初始化
     //Save fallmap data
     vector<vector<float>> FallmapDataVec;
     vector<float> FallmapData1;

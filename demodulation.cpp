@@ -21,7 +21,7 @@ Demodulation::Demodulation(UDP_Recv* udp_Recv, int DemoFlashTime, int freq, int 
 {
     udp_recv = udp_Recv;
 
-    DEMOdata_flash = make_shared<CirQueue<float>>(peakNum*Freq*DemoFlashTime/1000*10000); //1s数据量 * 10000
+    DEMOdata_flash = make_shared<CirQueue<float>>(peakNum*Freq*DemoFlashTime/1000*20000); //1s数据量 * 20000
     DEMOdata_save = make_shared<CirQueue<float>>(peakNum*Freq*60000/1000*10); //60s数据量 * 10
 
     readAtanTable(atanTable);
@@ -111,11 +111,11 @@ float Demodulation::OpenFilter(int i, float* FirstRealPh)
 
     float HPRealPh = RealPhOut[i][2]; //高通滤波结果
 
-//    return HPRealPh; //返回高通滤波后数据
+    return HPRealPh; //返回高通滤波后数据
 
-    Lpfilter(i,HPRealPh);  //调用低通滤波函数
+//    Lpfilter(i,HPRealPh);  //调用低通滤波函数
 
-    return output[i]; //返回高通＋低通滤波后数据
+  //  return output[i]; //返回高通＋低通滤波后数据
 }
 
 void Demodulation::run()
@@ -270,7 +270,7 @@ void Demodulation::ReadFilterCoeff(float *HPFcoeff, float *LPFcoeff)
     //fileName = QString("ChebysheyIIFilterCoefficient_Order8_4Section_")+QString::number((int)(frequency/1000))+QString("KHz_1Hz.bin");//1Hz的高通滤波器文件名为ButtorWorthFilterCoefficient_Order8_1KHz_1Hz
     //fileName2 = QString("LPFilterCoefficient_")+QString::number((int)(frequency/1000))+QString("KHz_400Hz.bin");// 400Hz低通滤波器文件名LPFilterCoefficient_1KHz_400Hz.bin
 
-    QString pat = QString("C:/DAS_Metro/ButtorWorthFilterCoefficient_1KHz_10Hz.bin"); //高通滤波
+    QString pat = QString("C:/DAS_Metro/ButtorWorthFilterCoefficient_1KHz_3Hz.bin"); //高通滤波
     QString pat2 = QString("C:/DAS_Metro/LPFilterCoefficient_1KHz_30Hz.bin"); //低通滤波
 
     //    qDebug()<<"Filter Coefficient path:"<<pat.toStdString().c_str()<<"  "<<pat2.toStdString().c_str();

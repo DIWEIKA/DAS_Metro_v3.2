@@ -126,7 +126,7 @@ T CirQueue<T>::pop()
 {
     if (isEmpty())
     {
-        printf("The Circle Queue is Empty!!\n");
+//        printf("The Circle Queue is Empty!!\n");
         return m_data[m_front];
     }
     m_front = (m_front + 1) % M_LEN;

@@ -74,7 +74,7 @@ void UDP_Recv::run()
 
             net_pack_size = recvfrom(echo_socket_WIN, (char*)p_echo_net_pack, lenoRecvHEX, 0, (sockaddr *)&src_addr_WIN, &src_addr_len);
 
-            qDebug()<<"Reciving net_pack_size = "<< net_pack_size <<endl;
+//            qDebug()<<"Reciving net_pack_size = "<< net_pack_size <<endl;
 
             //clear QByteArray
             p_echo_net_pack_array.clear();

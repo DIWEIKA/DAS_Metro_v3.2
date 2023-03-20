@@ -28,7 +28,7 @@ void demowave_widget2::setHtmlPages()
 
     m_demowave_widget = ui->demowave_widget;
     m_demowave_widget->setContextMenuPolicy(Qt::NoContextMenu);
-    m_demowave_widget->load(QUrl::fromLocalFile(QString("C:/DAS_Metro/PAGE/tpl03/DemoWaveDisplay3.0.html")));
+    m_demowave_widget->load(QUrl::fromLocalFile(QString("C:/DAS_Metro/PAGE/tpl03/DemoWaveDisplay4.0.html")));
 
     webChannel4 = new QWebChannel;
 
@@ -42,17 +42,17 @@ void demowave_widget2::setHtmlPages()
 //Ë¢ÐÂ²¨ÐÎÏÔÊ¾
 void demowave_widget2::FlashDemoWave()
 {
-    qDebug() <<"Flash Demodulation Wave Slot responsed !"<<endl;
+//    qDebug() <<"Flash Demodulation Wave Slot responsed !"<<endl;
 
     //demowave display
-    QString demo_wave_js = QString("demo_wave(%1)").arg(QString(QJsonDocument(m_demowave->GetDemoWaveObj()).toJson()));
-    m_demowave_widget->page()->runJavaScript(demo_wave_js);
+//    QString demo_wave_js = QString("demo_wave(%1)").arg(QString(QJsonDocument(m_demowave->GetDemoWaveObj()).toJson()));
+//    m_demowave_widget->page()->runJavaScript(demo_wave_js);
 
 }
 
 void demowave_widget2::FlashFallmap()
 {
-    qDebug() <<"Flash Fallmap Slot responsed !"<<endl;
+//    qDebug() <<"Flash Fallmap Slot responsed !"<<endl;
 
     //fallmap display
     QString fallmap_js = QString("fallmap_flash(%1)").arg(QString(QJsonDocument(m_fallmap->GetFallmapObj()).toJson()));

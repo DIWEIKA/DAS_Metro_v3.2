@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html>
 
@@ -18,7 +18,7 @@
 
 <body id="body">
 	<header id="header">
-		<h3 class="header-title">解调波形显示</h3>
+		<h3 class="header-title">轨道模型演示</h3>
 	</header>
 
 	<!-- 页面缩放设置分辨率 -->
@@ -54,36 +54,17 @@
 		<h3 class="count-title">当前过车次数：</h3>
 		<label class="count-number" id="count-number">0</label>
 		<div id="flexCon">
-			<img id="t1" src="./img/train.png" >
-			<img id="t2" src="./img/train.png" >
-			<img id="t3" src="./img/train.png" >
-			<img id="t4" src="./img/train.png" >
-			<img id="t5" src="./img/train.png" >
-			<img id="t6" src="./img/train.png" >
-			<img id="t7" src="./img/train.png" >
-			<img id="t8" src="./img/train.png" >
-			<img id="t9" src="./img/train.png" >
-			<img id="t10" src="./img/train.png">
-			<img id="t11" src="./img/train.png" >
-			<img id="t12" src="./img/train.png" >
-			<img id="t13" src="./img/train.png" >
-			<img id="t14" src="./img/train.png" >
-			<img id="t15" src="./img/train.png" >
-			<img id="t16" src="./img/train.png" >
-			<img id="t17" src="./img/train.png" >
-			<img id="t18" src="./img/train.png" >
-			<img id="t19" src="./img/train.png" >
-			<img id="t20" src="./img/train.png" >
-			<img id="t21" src="./img/train.png" >
-			<img id="t22" src="./img/train.png" >
-			<img id="t23" src="./img/train.png" >
-			<img id="t24" src="./img/train.png" >
-			<img id="t25" src="./img/train.png">
-			<img id="t26" src="./img/train.png" >
-			<img id="t27" src="./img/train.png" >
-			<img id="t28" src="./img/train.png" >
-			<img id="t29" src="./img/train.png" >
-			<img id="t30" src="./img/train.png">
+			<img id="t1" src="./img/train1.png" >
+			<img id="t2" src="./img/train1.png" >
+			<img id="t3" src="./img/train1.png" >
+            <img id="warning3" src="./img/warning.png" >
+			<div class="show" id="t4"></div>
+			<img id="t5" src="./img/train3.png" >
+			<img id="t6" src="./img/train3.png" >
+			<img id="t7" src="./img/train3.png" >
+            <img id="warning-train" src="./img/warning-train.png">
+            <img id="warning-rail" src="./img/warning-rail.png" >
+			<div class="show" id="t8"></div>
 			
 		
 
@@ -97,9 +78,10 @@
 				<div class="label" id="label1">测区号</div>
 				<div class="region_3-div" id="label1_box"><span id="region"></span></div>
 
-				<div class="region_2-div" id="region_2-view"></div>
+				<div class="label" id="label2">列车状态</div>
+				<div class="region_2-div"><span id="is_train"></span></div>
 
-				<div class="label" id="label2">状态</div>
+				<div class="label" id="label3">轨道状态</div>
 				<div class="region_4-div" id="label2_box"><span id="is_normal"></span></div>
 
 
@@ -144,131 +126,126 @@
 
 		/******************* 测区判断 ******************/
 		
-		document.getElementById('t1').style.visibility = "hidden";
-		document.getElementById('t2').style.visibility = "hidden";
-		document.getElementById('t3').style.visibility = "hidden";
-		document.getElementById('t4').style.visibility = "hidden";
-		document.getElementById('t5').style.visibility = "hidden";
-		document.getElementById('t6').style.visibility = "hidden";
-		document.getElementById('t7').style.visibility = "hidden";
-		document.getElementById('t8').style.visibility = "hidden";
-		document.getElementById('t9').style.visibility = "hidden";
-		document.getElementById('t10').style.visibility = "hidden";
-		document.getElementById('t11').style.visibility = "hidden";
-		document.getElementById('t12').style.visibility = "hidden";
-		document.getElementById('t13').style.visibility = "hidden";
-		document.getElementById('t14').style.visibility = "hidden";
-		document.getElementById('t15').style.visibility = "hidden";
-		document.getElementById('t16').style.visibility = "hidden";
-		document.getElementById('t17').style.visibility = "hidden";
-		document.getElementById('t18').style.visibility = "hidden";
-		document.getElementById('t19').style.visibility = "hidden";
-		document.getElementById('t20').style.visibility = "hidden";
-		document.getElementById('t21').style.visibility = "hidden";
-		document.getElementById('t22').style.visibility = "hidden";
-		document.getElementById('t23').style.visibility = "hidden";
-		document.getElementById('t24').style.visibility = "hidden";
-		document.getElementById('t25').style.visibility = "hidden";
-		document.getElementById('t26').style.visibility = "hidden";
-		document.getElementById('t27').style.visibility = "hidden";
-		document.getElementById('t28').style.visibility = "hidden";
-		document.getElementById('t29').style.visibility = "hidden";
-		document.getElementById('t30').style.visibility = "hidden";
+		 document.getElementById('t1').style.visibility = "hidden";
+		 document.getElementById('t2').style.visibility = "hidden";
+		 document.getElementById('t3').style.visibility = "hidden";
+		 document.getElementById('t4').style.visibility = "hidden";
+		 document.getElementById('t5').style.visibility = "hidden";
+		 document.getElementById('t6').style.visibility = "hidden";
+		 document.getElementById('t7').style.visibility = "hidden";
+		 document.getElementById('t8').style.visibility = "hidden";
+		
 		
 		function judgement_flash(str){
 			var region = document.getElementById('region');
 			region.innerHTML = str["present_region"];
-			// let region_data=[];
-			// var n=0;
-			// region_data.push(3);
-			// var region = document.getElementById('region');
-			// region_data.push(str["present_region"]);
-			// n=n+1;
-			// if(region_data[n] == region_data[n-1]-1 || region_data[n] == region_data[n-1]+1){
-			// 	region.innerHTML = region_data[n];
-				
-			// }
-			// else{
-			// 	region.innerHTML = region_data[n-1];
-			// 	region_data[n]=region_data[n-1];
-			// }	
+			
 			
 			var is_normal= document.getElementById('is_normal');
-			var flag = str["IsFault"];
-			if(flag == 1 ){
-				is_normal.innerHTML='故障';
+			var is_train= document.getElementById('is_train');
+			var flag = str["IsLineFault"];
+			var flag2 = str["IsTrainFault"];
+			var flag3 = str["IsBegin"];
+			//flag3 = 1;
+			if (flag3 == 0) {
+			    region.innerHTML = str["present_region"];
+			    if (flag == 1 && flag2 == 0) {
+			        is_normal.innerHTML = '测区' + str["present_region"] + '故障';
+			        document.getElementById('warning3').style.display = "block";
+			        document.getElementById('warning-rail').style.display = "block";
+			    }
+			    else {
+			        is_normal.innerHTML = '测区' + str["present_region"] + '正常';
+			        //   document.getElementById('warning3').style.display = "none";
+			    }
+			    if (flag2 == 1) {
+			        is_train.innerHTML = '列车故障';
+			        document.getElementById('warning-train').style.display = "block";
+			    }
+			    else {
+			        is_train.innerHTML = '列车正常';
+			        document.getElementById('warning-train').style.display = "none";
+			    }
+
 			}
-			else is_normal.innerHTML='正常';
-		
+			if (flag3 == 1) {
+			    region.innerHTML = '无过车信号';
+			    is_normal.innerHTML = '无过车信号';
+			    is_train.innerHTML = '无过车信号';
+			    document.getElementById('warning3').style.display = "none";
+			    document.getElementById('warning-rail').style.display = "none";
+			    document.getElementById('warning-train').style.display = "none";
+			}
 			
 
 
-			for(i=1;i<31;i++){
-
-				document.getElementById("t"+i.toString()).style.visibility = "hidden";
-			}
-			document.getElementById("t"+str['present_region'].toString()).style.visibility = "visible";
+			 for(i=1;i<9;i++){
+			    // document.getElementById("t" + i.toString()).style.animation = "none";
+			     document.getElementById("t" + i.toString()).style.visibility = "hidden";
+			     //document.getElementById("t" + i.toString()).style.animationPlayState = "paused";
+			 }
+			 document.getElementById("t"+(str['present_region']-1).toString()).style.visibility = "visible";
+			
 		}
-		// function display_region(str){
 
-		// }
+	
 		
 
 
 
 
 		// /******************* demo_wave display ******************/
-		function demo_wave(str) {
+		// function demo_wave(str) {
 
-			var dis_len = str["dis_len"]; //  一次显示横轴长度
-			var date = [];
-			for (let i = 0; i < dis_len; ++i) {
-				date.push([i]);
-			}
+		// 	var dis_len = str["dis_len"]; //  一次显示横轴长度
+		// 	var date = [];
+		// 	for (let i = 0; i < dis_len; ++i) {
+		// 		date.push([i]);
+		// 	}
 
-			var dom = document.getElementById("region_2-view");
-			var myChart = echarts.init(dom, null, {
-				renderer: 'canvas',
-				useDirtyRect: false
-			});
+		// 	var dom = document.getElementById("region_2-view");
+		// 	var myChart = echarts.init(dom, null, {
+		// 		renderer: 'canvas',
+		// 		useDirtyRect: false
+		// 	});
 
-			var option;
+		// 	var option;
 
-			option = {
-				animation: false,
-				tooltip: {
-					trigger: 'axis',
-					position: function (pt) {
-						return [pt[0], '10%'];
-					}
-				},
-				title: {
-					left: 'center',
-					text: 'Present Region'
-				},
-				toolbox: {
-					feature: {
-						dataZoom: {
-							yAxisIndex: 'none'
-						},
-						restore: {},
-						saveAsImage: {}
-					}
-				},
-				xAxis: {
-					type: 'category',
-					boundaryGap: false,
-					data: date,
-				},
-				yAxis: {
-					type: 'value',
-					boundaryGap: [0, '100%'],
-					splitLine: {
-						show: false
-					},
-					min: -12,
-					max: 12
-				},
+		// 	option = {
+		// 		animation: false,
+		// 		tooltip: {
+		// 			trigger: 'axis',
+		// 			position: function (pt) {
+		// 				return [pt[0], '10%'];
+		// 			}
+		// 		},
+		// 		title: {
+		// 			left: 'center',
+		// 			text: 'Present Region'
+		// 		},
+		// 		toolbox: {
+		// 			feature: {
+		// 				dataZoom: {
+		// 					yAxisIndex: 'none'
+		// 				},
+		// 				restore: {},
+		// 				saveAsImage: {}
+		// 			}
+		// 		},
+		// 		xAxis: {
+		// 			type: 'category',
+		// 			boundaryGap: false,
+		// 			data: date,
+		// 		},
+		// 		yAxis: {
+		// 			type: 'value',
+		// 			boundaryGap: [0, '100%'],
+		// 			splitLine: {
+		// 				show: false
+		// 			},
+		// 			min: -12,
+		// 			max: 12
+		// 		},
 				// dataZoom: [
 				// 	{
 				// 		type: 'inside',
@@ -280,32 +257,32 @@
 				// 		end: 10
 				// 	}
 				// ],
-				series: [
-					{
-						name: 'Demo Data',
-						type: 'line',
-						showSymbol: 'false',
-						symbol: 'none',
-						sampling: 'average',
-						itemStyle: {
-							color: 'yellow',
-						},
+		// 		series: [
+		// 			{
+		// 				name: 'Demo Data',
+		// 				type: 'line',
+		// 				showSymbol: 'false',
+		// 				symbol: 'none',
+		// 				sampling: 'average',
+		// 				itemStyle: {
+		// 					color: 'yellow',
+		// 				},
 
-						data: str["demo_wave"]
-					}
-				]
-			};
-
-
-
-			if (option && typeof option === 'object') {
-				myChart.setOption(option);
-			}
-
-			window.addEventListener('resize', myChart.resize);
+		// 				data: str["demo_wave"]
+		// 			}
+		// 		]
+		// 	};
 
 
-		}
+
+		// 	if (option && typeof option === 'object') {
+		// 		myChart.setOption(option);
+		// 	}
+
+		// 	window.addEventListener('resize', myChart.resize);
+
+
+		// }
 
 
 		function fallmap_flash(str) {
