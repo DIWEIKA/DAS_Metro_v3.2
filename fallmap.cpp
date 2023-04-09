@@ -146,7 +146,7 @@ void fallmap::Begin_State_Judge(const int present_region, const vector<float>& m
         InitState();
     }
 
-    qDebug()<<"Begin = " << Begin <<endl;
+    //qDebug()<<"Begin = " << Begin <<endl;
 }
 
 void fallmap::run()
@@ -445,6 +445,8 @@ void fallmap::Fault_Detection(const int present_region, int len)
             train_fault_cnt = 0;
         }
     }
+   if(Begin==1){
+       line_cnt_1 = 0;line_cnt_2 = 0;line_cnt_3 = 0;line_cnt_4 = 0;line_cnt_5 = 0;line_cnt_6 = 0;line_cnt_7 = 0;line_cnt_8 = 0;line_cnt_9 = 0;}
   /* if(region_cnt == 8){
       // Begin = 0;
        if(train_fault_cnt >= 5){

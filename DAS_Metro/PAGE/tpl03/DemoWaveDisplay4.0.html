@@ -6,7 +6,7 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width,initial-scale=1" />
 	<title>地铁轨道监测</title>
-	<link rel="stylesheet" type="text/css" href="css/DemoWaveDisplay.css" />
+	<link rel="stylesheet" type="text/css" href="css/DemoWaveDisplay - 副本.css" />
 	<script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
 	<script src="jQuery.js"></script>
 	<script src="qwebchannel.js"></script>
@@ -45,51 +45,71 @@
 		}
 
 		windowResize()
-		// 监听窗口尺寸变化
+		// 监听窗口尺寸变化 		<h3 class="count-title">当前过车次数：</h3> <label class="count-number" id="count-number">0</label>
 		window.addEventListener('resize', windowResize);
 
 	</script>
 
 	<div id="container">
-		<h3 class="count-title">当前过车次数：</h3>
-		<label class="count-number" id="count-number">0</label>
-		<div id="flexCon">
-			<img id="t1" src="./img/train1.png" >
-			<img id="t2" src="./img/train1.png" >
-			<img id="t3" src="./img/train1.png" >
-            <img id="warning3" src="./img/warning.png" >
-			<div class="show" id="t4"></div>
-			<img id="t5" src="./img/train3.png" >
-			<img id="t6" src="./img/train3.png" >
-			<img id="t7" src="./img/train3.png" >
-            <img id="warning-train" src="./img/warning-train.png">
-            <img id="warning-rail" src="./img/warning-rail.png" >
-			<div class="show" id="t8"></div>
-			
-		
+        <div id="flexCon">
+            <img id="t1" src="./img/train-right.png">
+            <img id="warning1" src="./img/warning.png">
+            <img id="t2" src="./img/train-right.png">
+            <img id="warning2" src="./img/warning.png">
+            <img id="t3" src="./img/train-right.png">
+            <img id="warning3" src="./img/warning.png">
+            <img id="t4" src="./img/train-right.png">
+            <img id="warning4" src="./img/warning.png">
+            <img id="t5" src="./img/train-left.png">
+            <img id="warning5" src="./img/warning.png">
+            <img id="t6" src="./img/train-left.png">
+            <img id="warning6" src="./img/warning.png">
+            <img id="t7" src="./img/train-left.png">
+            <img id="warning7" src="./img/warning.png">
+            <img id="warning-train" src="./img/warning-train.gif">
+            <img id="warning-rail" src="./img/warning-rail.gif">
+            <img id="t8" src="./img/train-left.png">
+            <img id="warning8" src="./img/warning.png">
 
-			<div class="flex-row">
-				<div class="region_1-div" id="region_1-view"></div>
+
+            <div class="flex-row">
+                <div class="region_1-div" id="region_1-view"></div>
+
+            </div>
+            <div class="flex-row" id="info-box">
+                
+                <div class="region_3-div info-item" id="label1_box">
+					<div class="label" id="label1">测区号</div>
+					<span id="region" class="info-msg"></span>
+				</div>
+
+                <div class="region_2-div info-item">
+					<div class="label" id="label2">列车状态</div>
+					<span id="is_train" class="info-msg"></span>
+				</div>
+
 				
+				<div class="region2-3 info-item">
+					<div class="label" id="label2-3">异常记录</div>
+					<ul class="err-list" id="err-list">
+<!-- 						<li>测区x故障</li>
+						<li>测区y故障</li>
+						<li>列车故障</li>
+						<li>测区x故障</li>
+						<li>列车故障</li>
+						<li>列车故障</li> -->
+					</ul>
+				</div>
 
-			</div>
+                
+                <div class="region_4-div info-item" id="label2_box">
+					<div class="label" id="label3">轨道状态</div>
+					<span id="is_normal" class="info-msg"></span>
+				</div>
+				
+            </div>
 
-			<div class="flex-row">
-				<div class="label" id="label1">测区号</div>
-				<div class="region_3-div" id="label1_box"><span id="region"></span></div>
-
-				<div class="label" id="label2">列车状态</div>
-				<div class="region_2-div"><span id="is_train"></span></div>
-
-				<div class="label" id="label3">轨道状态</div>
-				<div class="region_4-div" id="label2_box"><span id="is_normal"></span></div>
-
-
-			</div>
-
-    
-
-		</div>
+        </div>
 		
 		
 
@@ -134,8 +154,19 @@
 		 document.getElementById('t6').style.visibility = "hidden";
 		 document.getElementById('t7').style.visibility = "hidden";
 		 document.getElementById('t8').style.visibility = "hidden";
-		
-		
+		class ErrQueue{
+			constructor(){
+				this.queue=[]
+			}
+			push(x){
+				if(this.queue.length==6){
+					this.queue.shift()
+				}
+				this.queue.push(x)
+			}
+		}
+		let err_queue = new ErrQueue();
+		 let prev=null;
 		function judgement_flash(str){
 			var region = document.getElementById('region');
 			region.innerHTML = str["present_region"];
@@ -146,12 +177,20 @@
 			var flag = str["IsLineFault"];
 			var flag2 = str["IsTrainFault"];
 			var flag3 = str["IsBegin"];
-			//flag3 = 1;
+			//var flag4 = str["Abnormal"];
+			flag3=0;
 			if (flag3 == 0) {
 			    region.innerHTML = str["present_region"];
+				/*if(flag4==1){
+					let msg = '测区' + str["present_region"] + '异常'
+					is_normal.innerHTML = msg;
+					err_queue.push(msg);
+				}*/
 			    if (flag == 1 && flag2 == 0) {
-			        is_normal.innerHTML = '测区' + str["present_region"] + '故障';
-			        document.getElementById('warning3').style.display = "block";
+					let msg = '测区' + str["present_region"] + '故障'
+			        is_normal.innerHTML = msg;
+					err_queue.push(msg);
+			        document.getElementById("warning"+(str["present_region"]-1).toString()).style.display = "block";
 			        document.getElementById('warning-rail').style.display = "block";
 			    }
 			    else {
@@ -159,7 +198,9 @@
 			        //   document.getElementById('warning3').style.display = "none";
 			    }
 			    if (flag2 == 1) {
-			        is_train.innerHTML = '列车故障';
+					let msg = '列车故障'
+			        is_train.innerHTML = msg;
+					err_queue.push(msg);
 			        document.getElementById('warning-train').style.display = "block";
 			    }
 			    else {
@@ -177,15 +218,67 @@
 			    document.getElementById('warning-train').style.display = "none";
 			}
 			
+		    const position_of_train_left = ["18%","38%","61%","74%","74%","57%","34%","18%"]
+		    const position_of_train_top = ["-0.5%","-0.5%","-0.5%","-0.5%","35.5%","35.5%","35.5%","35.5%"]
+		    let present = (str['present_region'] - 1);
+		    
+		    if (present != prev) {
+                //alert(prev)
+		        for (let i = 1; i < 9; i++) {
 
+		            //document.getElementById("t" + i.toString()).style.animation = "none";
+		            if (present == i) continue;
+		            let t_x = document.getElementById("t" + i.toString());
+		            t_x.style.visibility = "hidden";
+                    t_x.style.transition="none"
+					if (present == 8 ) {
+						t_x.style.transform="rotate(0)"
+					}else if(present == 4){
+						t_x.style.transform="rotate(0)"
+					}else{
+						t_x.style.marginLeft = position_of_train_left[i - 1];
+		                t_x.style.marginTop = position_of_train_top[i - 1];
+					}
+		                
+		                
 
-			 for(i=1;i<9;i++){
-			    // document.getElementById("t" + i.toString()).style.animation = "none";
-			     document.getElementById("t" + i.toString()).style.visibility = "hidden";
-			     //document.getElementById("t" + i.toString()).style.animationPlayState = "paused";
-			 }
-			 document.getElementById("t"+(str['present_region']-1).toString()).style.visibility = "visible";
-			
+		            
+		            
+		            //document.getElementById("t" + i.toString()).style.animationPlayState = "paused";
+		            //document.getElementById("t" + i.toString()).style.animationDuration = "0s";
+		            //document.getElementById("t" + i.toString()).style.animationFillMode = "backwards";
+		        }
+		        //document.getElementById("t" + (str['present_region'] - 1).toString()).style.visibility = "visible";
+		        //document.getElementById("t" + (str['present_region'] - 1).toString()).style.animationDuration = "2s";
+		        //document.getElementById("t" + (str['present_region'] - 1).toString()).style.animationPlayState = "running";
+		        //document.getElementById("t" + (str['present_region'] - 1).toString()).style.animationFillMode = "forwards";
+		        let t_present = document.getElementById("t" + present.toString())
+                t_present.style.transition="all 2s"
+                t_present.style.visibility = "visible";
+                if (present == 8 ) {
+                    t_present.style.transform="rotate(180deg)"
+                }else if(present == 4){
+					t_present.style.transform='rotate(180deg)'
+				} else {
+                    t_present.style.marginLeft = position_of_train_left[(present == 8) ? 0 : present];
+                    t_present.style.marginTop = position_of_train_top[(present == 8) ? 0 : present];
+                }
+                    
+               
+		        
+		    }
+            prev=present
+
+			//for (j = 1; j < 9; j++) {
+			//    if (document.getElementById("t" + j.toString()).style.visibility = "visible") {
+			//        document.getElementById("t" + j.toString()).style.animationPlayState = "running";
+			//    }
+			//    else {
+			//        document.getElementById("t" + j.toString()).style.animationPlayState = "paused";
+			//    }
+			//}
+			const li = document.getElementById("err-list");
+			li.innerHTML = err_queue.queue.reduce((prev,cur)=>prev+"<li>"+cur+"</li>","")
 		}
 
 	
@@ -296,7 +389,7 @@
 			var option;
 
 			var N1 = 60; //横轴的长度(刷新次数)
-			var N2 = 9; //纵轴的长度(区域个数)
+			var N2 = 8; //纵轴的长度(区域个数)
 			var N3 = 0; //起始频率
 
 			let region = [];
@@ -314,308 +407,12 @@
 			let itemX = [];
 			let data = [];
 
-			let fallmap_data_1 = [];
-			let fallmap_data_2 = [];
-			let fallmap_data_3 = [];
-			let fallmap_data_4 = [];
-			let fallmap_data_5 = [];
-			let fallmap_data_6 = [];
-			let fallmap_data_7 = [];
-			let fallmap_data_8 = [];
-			let fallmap_data_9 = [];
-			let fallmap_data_10 = [];
-			let fallmap_data_11 = [];
-			let fallmap_data_12 = [];
-			let fallmap_data_13 = [];
-			let fallmap_data_14 = [];
-			let fallmap_data_15 = [];
-			let fallmap_data_16 = [];
-			let fallmap_data_17 = [];
-			let fallmap_data_18 = [];
-			let fallmap_data_19 = [];
-			let fallmap_data_20 = [];
-			let fallmap_data_21 = [];
-			let fallmap_data_22 = [];
-			let fallmap_data_23 = [];
-			let fallmap_data_24 = [];
-			let fallmap_data_25 = [];
-			let fallmap_data_26 = [];
-			let fallmap_data_27 = [];
-			let fallmap_data_28 = [];
-			let fallmap_data_29 = [];
-			let fallmap_data_30 = [];
-			let fallmap_data_31 = [];
-			let fallmap_data_32 = [];
-			let fallmap_data_33 = [];
-			let fallmap_data_34 = [];
-			let fallmap_data_35 = [];
-			let fallmap_data_36 = [];
-			let fallmap_data_37 = [];
-			let fallmap_data_38 = [];
-			let fallmap_data_39 = [];
-			let fallmap_data_40 = [];
-			let fallmap_data_41 = [];
-			let fallmap_data_42 = [];
-			let fallmap_data_43 = [];
-			let fallmap_data_44 = [];
-			let fallmap_data_45 = [];
-			let fallmap_data_46 = [];
-			let fallmap_data_47 = [];
-			let fallmap_data_48 = [];
-			let fallmap_data_49 = [];
-			let fallmap_data_50 = [];
-			let fallmap_data_51 = [];
-			let fallmap_data_52 = [];
-			let fallmap_data_53 = [];
-			let fallmap_data_54 = [];
-			let fallmap_data_55 = [];
-			let fallmap_data_56 = [];
-			let fallmap_data_57 = [];
-			let fallmap_data_58 = [];
-			let fallmap_data_59 = [];
-			let fallmap_data_60 = [];
-
-			fallmap_data_1 = str["fallmap_data_1"];
-			fallmap_data_2 = str["fallmap_data_2"];
-			fallmap_data_3 = str["fallmap_data_3"];
-			fallmap_data_4 = str["fallmap_data_4"];
-			fallmap_data_5 = str["fallmap_data_5"];
-			fallmap_data_6 = str["fallmap_data_6"];
-			fallmap_data_7 = str["fallmap_data_7"];
-			fallmap_data_8 = str["fallmap_data_8"];
-			fallmap_data_9 = str["fallmap_data_9"];
-			fallmap_data_10 = str["fallmap_data_10"];
-			fallmap_data_11 = str["fallmap_data_11"];
-			fallmap_data_12 = str["fallmap_data_12"];
-			fallmap_data_13 = str["fallmap_data_13"];
-			fallmap_data_14 = str["fallmap_data_14"];
-			fallmap_data_15 = str["fallmap_data_15"];
-			fallmap_data_16 = str["fallmap_data_16"];
-			fallmap_data_17 = str["fallmap_data_17"];
-			fallmap_data_18 = str["fallmap_data_18"];
-			fallmap_data_19 = str["fallmap_data_19"];
-			fallmap_data_20 = str["fallmap_data_20"];
-			fallmap_data_21 = str["fallmap_data_21"];
-			fallmap_data_22 = str["fallmap_data_22"];
-			fallmap_data_23 = str["fallmap_data_23"];
-			fallmap_data_24 = str["fallmap_data_24"];
-			fallmap_data_25 = str["fallmap_data_25"];
-			fallmap_data_26 = str["fallmap_data_26"];
-			fallmap_data_27 = str["fallmap_data_27"];
-			fallmap_data_28 = str["fallmap_data_28"];
-			fallmap_data_29 = str["fallmap_data_29"];
-			fallmap_data_30 = str["fallmap_data_30"];
-			fallmap_data_31 = str["fallmap_data_31"];
-			fallmap_data_32 = str["fallmap_data_32"];
-			fallmap_data_33 = str["fallmap_data_33"];
-			fallmap_data_34 = str["fallmap_data_34"];
-			fallmap_data_35 = str["fallmap_data_35"];
-			fallmap_data_36 = str["fallmap_data_36"];
-			fallmap_data_37 = str["fallmap_data_37"];
-			fallmap_data_38 = str["fallmap_data_38"];
-			fallmap_data_39 = str["fallmap_data_39"];
-			fallmap_data_40 = str["fallmap_data_40"];
-			fallmap_data_41 = str["fallmap_data_41"];
-			fallmap_data_42 = str["fallmap_data_42"];
-			fallmap_data_43 = str["fallmap_data_43"];
-			fallmap_data_44 = str["fallmap_data_44"];
-			fallmap_data_45 = str["fallmap_data_45"];
-			fallmap_data_46 = str["fallmap_data_46"];
-			fallmap_data_47 = str["fallmap_data_47"];
-			fallmap_data_48 = str["fallmap_data_48"];
-			fallmap_data_49 = str["fallmap_data_49"];
-			fallmap_data_50 = str["fallmap_data_50"];
-			fallmap_data_51 = str["fallmap_data_51"];
-			fallmap_data_52 = str["fallmap_data_52"];
-			fallmap_data_53 = str["fallmap_data_53"];
-			fallmap_data_54 = str["fallmap_data_54"];
-			fallmap_data_55 = str["fallmap_data_55"];
-			fallmap_data_56 = str["fallmap_data_56"];
-			fallmap_data_57 = str["fallmap_data_57"];
-			fallmap_data_58 = str["fallmap_data_58"];
-			fallmap_data_59 = str["fallmap_data_59"];
-			fallmap_data_60 = str["fallmap_data_60"];
-
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([0, j, fallmap_data_1[j - N3]]);
+			for(let i=1;i<=60;i++){
+				for(let j=N3;j < (N2 + N3); ++j){
+					data.push([i-1, j, str['fallmap_data_'+i][j - N3]]);
+				}
 			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([1, j, fallmap_data_2[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([2, j, fallmap_data_3[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([3, j, fallmap_data_4[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([4, j, fallmap_data_5[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([5, j, fallmap_data_6[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([6, j, fallmap_data_7[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([7, j, fallmap_data_8[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([8, j, fallmap_data_9[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([9, j, fallmap_data_10[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([10, j, fallmap_data_11[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([11, j, fallmap_data_12[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([12, j, fallmap_data_13[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([13, j, fallmap_data_14[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([14, j, fallmap_data_15[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([15, j, fallmap_data_16[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([16, j, fallmap_data_17[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([17, j, fallmap_data_18[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([18, j, fallmap_data_19[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([19, j, fallmap_data_20[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([20, j, fallmap_data_21[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([21, j, fallmap_data_22[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([22, j, fallmap_data_23[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([23, j, fallmap_data_24[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([24, j, fallmap_data_25[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([25, j, fallmap_data_26[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([26, j, fallmap_data_27[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([27, j, fallmap_data_28[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([28, j, fallmap_data_29[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([29, j, fallmap_data_30[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([30, j, fallmap_data_31[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([31, j, fallmap_data_32[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([32, j, fallmap_data_33[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([33, j, fallmap_data_34[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([34, j, fallmap_data_35[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([35, j, fallmap_data_36[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([36, j, fallmap_data_37[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([37, j, fallmap_data_38[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([38, j, fallmap_data_39[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([39, j, fallmap_data_40[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([40, j, fallmap_data_41[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([41, j, fallmap_data_42[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([42, j, fallmap_data_43[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([43, j, fallmap_data_44[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([44, j, fallmap_data_45[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([45, j, fallmap_data_46[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([46, j, fallmap_data_47[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([47, j, fallmap_data_48[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([48, j, fallmap_data_49[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([49, j, fallmap_data_50[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([50, j, fallmap_data_51[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([51, j, fallmap_data_52[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([52, j, fallmap_data_53[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([53, j, fallmap_data_54[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([54, j, fallmap_data_55[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([55, j, fallmap_data_56[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([56, j, fallmap_data_57[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([57, j, fallmap_data_58[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([58, j, fallmap_data_59[j - N3]]);
-			}
-			for (var j = N3; j < (N2 + N3); ++j) {
-				data.push([59, j, fallmap_data_60[j - N3]]);
-			}
+			
 
 
 			option = {

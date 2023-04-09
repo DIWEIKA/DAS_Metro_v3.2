@@ -19,7 +19,7 @@ body {
 body {
 	position: relative;
 	font-family: "Microsoft Yahei", Arial, sans-serif;
-	background: #050d3c url("../img/bg3.png") 0 0 / 100% 100% no-repeat;
+	background: #050d3c url("../img/bg4.png") 0 0 / 100% 100% no-repeat;
 }
 /* layout */
 #header {
@@ -197,13 +197,15 @@ body {
 }
 
 #t1 {
+    position: absolute;
     margin-left: 15%;
-    margin-top: -0.5%;
-    width: 4%;
-    height: 6%;
+    margin-top: -1%;
+    width: 10%;
+    height: 20%;
     animation-fill-mode: forwards;
     animation-name: move1;
     animation-duration: 2s;
+    animation-play-state: paused;
     animation-iteration-count: infinite;
 }
 @keyframes move1{
@@ -273,13 +275,15 @@ body {
 	}
 }
 #t2 {
+    position: absolute;
     margin-left: 38%;
-    margin-top: -3.5%;
-    width: 4%;
-    height: 6%;
-    animation-fill-mode: forwards;
+    margin-top: -1%;
+    width: 10%;
+    height: 20%;
+    animation-fill-mode: backwards;
     animation-name: move2;
     animation-duration: 2s;
+    animation-play-state: paused;
     animation-iteration-count: infinite /*infinite*/;
 }
 @keyframes move2{
@@ -364,16 +368,19 @@ body {
 	100%
 	{
 		margin-left:58%;
+        animation-play-state:paused;
 		
 	}
 }
 #t3 {
+    position:absolute;
     margin-left: 61%;
-    margin-top: -3%;
-    width: 4%;
-    height: 6%;
+    margin-top: -1%;
+    width: 10%;
+    height: 20%;
     animation-fill-mode: forwards;
     animation-name: move3;
+    animation-play-state: paused;
     animation-duration: 2s;
     animation-iteration-count: infinite;
 }
@@ -463,35 +470,89 @@ body {
 	}
 }
 
-#t4 {
+.t4 {
     display: block;
-    width: 60px;
-    height: 60px;
+    position:absolute;
+    width: 80px;
+    height: 160px;
     margin-left: 85%;
-    margin-top: -3%;
-    animation-fill-mode: forwards;
+    margin-top: -1%;
+    animation-play-state: paused;
     animation: center1 2s ease-in-out forwards;
     animation-iteration-count: infinite;
 }
-    #t4:after {
+    .t4:after {
         content: '';
         display: block;
-        width: 60px;
-        height: 60px;
-        background-image: url("../img/train1.png");
+        width: 80px;
+        height: 160px;
+        background-image: url("../img/train-right.png");
         background-size: cover;
+        animation-play-state: paused;
         animation: center2 2s ease-in-out forwards;
         animation-iteration-count: infinite;
     }
 @keyframes center1 {
 	0%{
-		transform: translateX(0px)
-		
+		transform: translateX(0px)		
 	}
+    5%{
+        transform:translateX(18px);
+    }
+    10% {
+        transform: translateX(36px);
+    }
+    15% {
+        transform: translateX(54px);
+    }
+    20% {
+        transform: translateX(72px);
+    }
+    25% {
+        transform: translateX(90px);
+    }
+    30% {
+        transform: translateX(108px);
+    }
+    35% {
+        transform: translateX(126px);
+    }
+    40% {
+        transform: translateX(144px);
+    }
+    45% {
+        transform: translateX(162px);
+    }
 	50%{
-		transform: translateX(180px)
-		
+		transform: translateX(180px)	
 	}
+    55% {
+        transform: translateX(162px);
+    }
+    60% {
+        transform: translateX(144px);
+    }
+    65% {
+        transform: translateX(126px);
+    }
+    70% {
+        transform: translateX(108px);
+    }
+    75% {
+        transform: translateX(90px);
+    }
+    80% {
+        transform: translateX(72px);
+    }
+    85% {
+        transform: translateX(54px);
+    }
+    90% {
+        transform: translateX(36px);
+    }
+    95% {
+        transform: translateX(18px);
+    }
 	100%{
 		transform: translateX(0px)
 		
@@ -502,20 +563,79 @@ body {
 		transform: translateY(0px)
 		rotate(0deg);
 	}
+    5% {
+        transform: translateY(36px) rotate(9deg);
+    }
+    10% {
+        transform: translateY(72px) rotate(18deg);
+    }
+    15% {
+        transform: translateY(108px) rotate(27deg);
+    }
+    20% {
+        transform: translateY(144px) rotate(36deg);
+    }
+    25% {
+        transform: translateY(180px) rotate(45deg);
+    }
+    30% {
+        transform: translateY(216px) rotate(54deg);
+    }
+    35% {
+        transform: translateY(252px) rotate(63deg);
+    }
+    40% {
+        transform: translateY(288px) rotate(72deg);
+    }
+    45% {
+        transform: translateY(324px) rotate(81deg);
+    }
+    50% {
+        transform: translateY(360px) rotate(90deg);
+    }
+    55% {
+        transform: translateY(396px) rotate(99deg);
+    }
+    60% {
+        transform: translateY(432px) rotate(108deg);
+    }
+    65% {
+        transform: translateY(468px) rotate(117deg);
+    }
+    70% {
+        transform: translateY(504px) rotate(126deg);
+    }
+    75% {
+        transform: translateY(540px) rotate(135deg);
+    }
+    80% {
+        transform: translateY(576px) rotate(144deg);
+    }
+    85% {
+        transform: translateY(612px) rotate(153deg);
+    }
+    90% {
+        transform: translateY(648px) rotate(162deg);
+    }
+    95% {
+        transform: translateY(684px) rotate(171deg);
+    }
 	100%{
-		transform: translateY(700px)
+		transform: translateY(720px)
 		rotate(180deg);
 	}
 }
 
 #t5 {
+    position:absolute;
     margin-left: 80%;
-    margin-top: 34.5%;
-    width: 4%;
-    height: 6%;
+    margin-top: 36.1%;
+    width: 10%;
+    height: 20%;
     animation-fill-mode: forwards;
     animation-name: move5;
     animation-duration: 2s;
+    animation-play-state: paused;
     animation-iteration-count: infinite;
 }
 @keyframes move5{
@@ -604,13 +724,15 @@ body {
 	}
 }
 #t6 {
+    position: absolute;
     margin-left: 57%;
-    margin-top: -3%;
-    width: 4%;
-    height: 6%;
+    margin-top: 36.1%;
+    width: 10%;
+    height: 20%;
     animation-fill-mode: forwards;
     animation-name: move6;
     animation-duration: 2s;
+    animation-play-state: paused;
     animation-iteration-count: infinite;
 }
 @keyframes move6{
@@ -699,14 +821,16 @@ body {
 	}
 }
 #t7 {
+    position: absolute;
     margin-left: 34%;
-    margin-top: -3%;
-    width: 4%;
-    height: 6%;
+    margin-top: 36.1%;
+    width: 10%;
+    height: 20%;
     animation-fill-mode: forwards;
     animation-name: move7;
     animation-duration: 2s /*2s*/;
-    animation-iteration-count: infinite /*infinite*/;
+    animation-play-state: paused;
+    animation-iteration-count: infinite;
 }
 @keyframes move7{
 	0%{
@@ -800,18 +924,19 @@ body {
 	height: 7%;
 } */
 #t8 {
-    display: block;
+    /*display: block;*/
     width: 60px;
     height: 60px;
     margin-left: 3%;
-    margin-top: -40%;
+    margin-top: -30%;
     animation-fill-mode: forwards;
+    animation-play-state: paused;
     animation: center3 2s ease-in-out forwards;
     animation-iteration-count: infinite;
 }
     #t8:after {
         content: '';
-        display: block;
+        /*display: block;*/
         width: 60px;
         height: 60px;
         background-image: url("../img/train3.png");
@@ -845,22 +970,81 @@ body {
 }
 #warning3 {
     margin-left: 72%;
-    margin-top: 0%;
+    margin-top: 5%;
     width: 6%;
     height: 8%;
     display: none;
+    position:absolute;
 }
 #warning-train {
     margin-left: 45%;
-    margin-top: -15%;
+    margin-top: 27%;
+    position:absolute;
     width: 10.5%;
     height: 14%;
     display: none;
 }
 #warning-rail {
-    margin-left: 70%;
-    margin-top: -20%;
+    margin-left: 69%;
+    margin-top: 27%;
     width: 10.5%;
     height: 14%;
+    position:absolute;
     display: none;
+}
+#warning1 {
+    margin-left: 25%;
+    margin-top: 5%;
+    width: 6%;
+    height: 8%;
+    display: none;
+    position: absolute;
+}
+#warning2 {
+    margin-left: 48%;
+    margin-top: 5%;
+    width: 6%;
+    height: 8%;
+    display: none;
+    position: absolute;
+}
+#warning4 {
+    margin-left: 48%;
+    margin-top: 5%;
+    width: 6%;
+    height: 8%;
+    display: none;
+    position: absolute;
+}
+#warning5 {
+    margin-left: 72%;
+    margin-top: 35%;
+    width: 6%;
+    height: 8%;
+    display: none;
+    position: absolute;
+}
+#warning6 {
+    margin-left: 48%;
+    margin-top: 35%;
+    width: 6%;
+    height: 8%;
+    display: none;
+    position: absolute;
+}
+#warning7 {
+    margin-left: 25%;
+    margin-top: 35%;
+    width: 6%;
+    height: 8%;
+    display: none;
+    position: absolute;
+}
+#warning8 {
+    margin-left: 72%;
+    margin-top: 5%;
+    width: 6%;
+    height: 8%;
+    display: none;
+    position: absolute;
 }

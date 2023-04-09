@@ -17,7 +17,7 @@
 #include <deque>
 
 #define Nf1 60 //fallmap xaxis length
-#define BASE 8 //region find upper limit (rad)
+#define BASE 10 //region find upper limit (rad)
 #define LIMIT 6 //fault detection upper limit (rad)
 #define PEAKLIMIT 0.5 //find peaks lower limit (rad)
 
@@ -27,7 +27,7 @@ enum demowave_peak_num{
     REGION2=103,
     REGION3=110,
     REGION4=100,
-    REGION5=100,
+    REGION5=110,
     REGION6=110,
     REGION7=110,
     REGION8=110,
@@ -94,7 +94,7 @@ private:
     int line_cnt_8=0;
     int line_cnt_9=0;
     int all_num = 0;
-    int Begin = 0;//初始态
+    int Begin = 1;//初始态
     std::deque<int> judge_q; //初始态计数容器
     //int Begin = 0;//初始化
     //Save fallmap data

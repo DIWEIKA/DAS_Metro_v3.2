@@ -12,8 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
     ,Freq(1*1000) //采样率
     ,demoFlashTime(1000)//解调信号 flash一次的时间
     ,pulseFlashTime(1000)//脉冲信号 flash一次的时间
-    ,fallmapFlashTime(1000) //瀑布图flash一次的时间
-    ,fallmapThreadTime(1000) //瀑布图Thread run一次的时间
+    ,fallmapFlashTime(200) //瀑布图flash一次的时间
+    ,fallmapThreadTime(200) //瀑布图Thread run一次的时间
 {
 
     ui->setupUi(this);
